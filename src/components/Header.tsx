@@ -104,7 +104,7 @@ export default function Header({
               🎓 <strong>Admissions 2026:</strong> B.Tech & M.Tech seat allotment round 1 result published on applicant portal.
             </span>
             <span>
-              🏷️ <strong>Hostels:</strong> Digital QR Gate Pass mandatory for all hostel residents (Kailash & Dhauladhar) after 8:00 PM.
+              📚 <strong>Central Library:</strong> Extended 24x7 reading room facility open for End-Term Examination preparation.
             </span>
           </div>
         </div>

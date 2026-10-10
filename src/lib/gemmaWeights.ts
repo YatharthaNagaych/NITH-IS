@@ -112,7 +112,7 @@ export const GEMMA_4_WEIGHTS_REGISTRY: Record<string, ModelWeightInfo> = {
     architecture: "Multimodal Vision-Language Model with 448x448 Patch Resolution & Contrastive Pre-training",
     quantization: "FP16 SafeTensors / INT8 GGUF",
     contextWindow: "8,192 Tokens + 512 Vision Tokens",
-    primaryUse: "Hostel Gate Pass QR Verification, Student ID Card Authentication, Medical Leave Certificate OCR",
+    primaryUse: "Student ID Card Authentication, Medical Leave Certificate OCR, Grade Card Verification",
     huggingFace: {
       repoId: "google/paligemma-4-pt-448",
       url: "https://huggingface.co/google/paligemma-4-pt-448",
@@ -121,7 +121,7 @@ export const GEMMA_4_WEIGHTS_REGISTRY: Record<string, ModelWeightInfo> = {
     ollama: {
       tag: "paligemma4:latest",
       runCommand: "ollama run paligemma4:latest",
-      modelfileSnippet: "FROM paligemma4:latest\nPARAMETER temperature 0.2\nSYSTEM \"PaliGemma 4 Multimodal Document & Gate Pass Verifier for NITH.\"",
+      modelfileSnippet: "FROM paligemma4:latest\nPARAMETER temperature 0.2\nSYSTEM \"PaliGemma 4 Multimodal Academic Document & Student ID Verifier for NITH.\"",
     },
     kaggle: {
       handle: "google/paligemma-4/transformers/paligemma-4-pt-448",

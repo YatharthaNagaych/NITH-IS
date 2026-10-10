@@ -43,7 +43,7 @@ export default function GemmaAiModal({ isOpen, onClose, defaultModel = "gemma-4"
              <ul>
                <li>🧠 <strong>Gemma 4 (Academic Reasoner)</strong>: Ordinance 7.2 attendance compliance optimizer and timetable advisor.</li>
                <li>💻 <strong>CodeGemma 4 (Lab Synthesizer)</strong>: C++20 STL, Python, Dijkstra algorithm proofs, and OS lab simulator.</li>
-               <li>👁️ <strong>PaliGemma 4 (Vision VLM)</strong>: Digital Hostel Gate Pass QR matrix verification and student ID OCR.</li>
+               <li>👁️ <strong>PaliGemma 4 (Vision VLM)</strong>: Student ID card OCR, scanned grade cards, and document authentication.</li>
                <li>🛡️ <strong>ShieldGemma 4 (Safety Guard)</strong>: Supreme Court & UGC Anti-Ragging policy compliance.</li>
              </ul>
              <p style="font-size:0.8rem; color:#475569;">
@@ -453,8 +453,8 @@ export default function GemmaAiModal({ isOpen, onClose, defaultModel = "gemma-4"
           )}
           {activeModel === "gemma-4-vision" && (
             <>
-              <button type="button" className="gemma-chip" onClick={() => handleSend("Verify Kailash Boys Hostel Gate Pass QR matrix and check student roll 26BCE123.")}>
-                👁️ Verify Hostel QR Matrix
+              <button type="button" className="gemma-chip" onClick={() => handleSend("Verify Student ID card photo matrix and authenticate student roll 26BCE123.")}>
+                👁️ Authenticate Student ID Card
               </button>
               <button type="button" className="gemma-chip" onClick={() => handleSend("How does PaliGemma 4 SigLIP-2 vision model inspect scanned grade cards and doctor certificates?")}>
                 📄 Grade Card & Medical OCR

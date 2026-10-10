@@ -16,13 +16,11 @@ import {
   DepartmentInfo,
   Course,
   UserAccount,
-  GatePass,
   AttendanceRecord,
   SyllabusRecord,
 } from "@/lib/data";
 import {
   loadStoredUsers,
-  loadStoredGatePasses,
   loadStoredAttendance,
   loadStoredSyllabus,
   saveAttendanceRecord,
@@ -40,7 +38,6 @@ export default function App() {
   // Persistence State
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [users, setUsers] = useState<UserAccount[]>([]);
-  const [gatePasses, setGatePasses] = useState<GatePass[]>([]);
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [syllabusRecords, setSyllabusRecords] = useState<SyllabusRecord[]>([]);
   const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(true);
@@ -57,7 +54,6 @@ export default function App() {
   // Load from Storage
   useEffect(() => {
     setUsers(loadStoredUsers());
-    setGatePasses(loadStoredGatePasses());
     setAttendanceRecords(loadStoredAttendance());
     setSyllabusRecords(loadStoredSyllabus());
 
@@ -280,8 +276,6 @@ export default function App() {
           onQuickAdjustAttendance={handleQuickAdjust}
           onOpenAttendanceModal={() => setIsAttendanceModalOpen(true)}
           currentUser={currentUser}
-          gatePasses={gatePasses}
-          onAddGatePass={(pass) => setGatePasses(prev => [pass, ...prev])}
         />
       )}
 
@@ -316,7 +310,6 @@ export default function App() {
         isOpen={isSupabaseOpen}
         onClose={() => setIsSupabaseOpen(false)}
         users={users}
-        gatePasses={gatePasses}
         attendance={attendanceRecords}
         syllabus={syllabusRecords}
         onConfigChange={handleSupabaseConfig}

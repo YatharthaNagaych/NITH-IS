@@ -394,7 +394,7 @@ export default function AuthModal({
   };
 
   const handleMobileAppClick = (platform: string) => {
-    alert(`📱 NITH-IS Student Mobile App (${platform}):\n\nThe official Android APK and iOS build are deployed via the NIT Hamirpur Computer Centre portal. Biometric login, push attendance notifications, and digital QR gate pass are integrated.`);
+    alert(`📱 NITH-IS Student Mobile App (${platform}):\n\nThe official Android APK and iOS build are deployed via the NIT Hamirpur Computer Centre portal. Biometric login, push attendance notifications, and grade cards are integrated.`);
   };
 
   return (
@@ -443,7 +443,7 @@ export default function AuthModal({
             <div className="cuims-showcase-headline">
               <h2>Student Gateway Portal</h2>
               <p>
-                Unified Information Management System for Ordinance 7.2 compliance, VLHC lecture hall timetable & biometric hostel gate pass.
+                Unified Information Management System for Ordinance 7.2 compliance, VLHC lecture hall timetable & academic fee receipts.
               </p>
             </div>
 
@@ -471,11 +471,11 @@ export default function AuthModal({
 
               <div className="cuims-feature-item">
                 <div className="cuims-feat-icon-bubble feat-pass">
-                  <span className="material-symbols-outlined">qr_code_2</span>
+                  <span className="material-symbols-outlined">description</span>
                 </div>
                 <div className="cuims-feat-text">
-                  <strong>Digital Hostel Gate Pass (24x7)</strong>
-                  <span>QR verified leave permits for Kailash, Himadri & Parvati</span>
+                  <strong>Fee Receipts & Academic Forms</strong>
+                  <span>Semester tuition fee receipts & official academic verification</span>
                 </div>
               </div>
 

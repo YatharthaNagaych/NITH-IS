@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Course, DepartmentInfo, GatePass, UserAccount } from "@/lib/data";
-import { saveGatePass } from "@/lib/supabaseClient";
+import { Course, DepartmentInfo, UserAccount } from "@/lib/data";
 import {
   computeStudentAttendance,
   ComputedStudentAttendance,
@@ -19,8 +18,6 @@ interface StudentPortalProps {
   deptData: DepartmentInfo;
   courses: Course[];
   currentUser: UserAccount | null;
-  gatePasses: GatePass[];
-  onAddGatePass: (pass: GatePass) => void;
   onQuickAdjustAttendance?: (courseCode: string, deltaAttended: number, deltaTotal: number) => void;
   onOpenAttendanceModal?: () => void;
 }
@@ -32,10 +29,8 @@ export default function StudentPortal({
   deptData,
   courses,
   currentUser,
-  gatePasses,
-  onAddGatePass,
 }: StudentPortalProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'attendance' | 'timetable' | 'hostel' | 'grades' | 'notices' | 'codegemma'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'attendance' | 'timetable' | 'grades' | 'notices' | 'codegemma'>('dashboard');
   const [activeDay, setActiveDay] = useState<string>("Wed");
   const [scheduleViewMode, setScheduleViewMode] = useState<'timeline' | 'matrix'>('timeline');
 
@@ -75,44 +70,11 @@ export default function StudentPortal({
     };
   }, [currentUser]);
 
-  // Gate Pass Form State
-  const [passType, setPassType] = useState<string>("Hamirpur Main Market (Stationery & Essentials)");
-  const [returnTime, setReturnTime] = useState<string>("20:30");
-  const [activePass, setActivePass] = useState<GatePass | null>(gatePasses[0] || null);
-
-  useEffect(() => {
-    if (gatePasses.length > 0) {
-      setActivePass(gatePasses[0]);
-    }
-  }, [gatePasses]);
-
   const overallPct = studentAtt.overallPercentage;
   const isOverallSafe = overallPct >= 75;
 
   // Timetable slots
   const slots = (deptData.timetable && deptData.timetable[activeDay]) || [];
-
-  // Gate Pass submission
-  const handleGatePassSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newPass: GatePass = {
-      id: "gp-" + Date.now(),
-      pass_number: "GP-2026-" + Math.floor(100 + Math.random() * 900),
-      student_roll_no: currentUser?.roll_no_or_emp_id || "26bce123",
-      student_name: currentUser?.full_name || "Yathartha Nagaych",
-      hostel_name: "Kailash Boys Hostel (KBH)",
-      room_no: "B-214",
-      destination: passType,
-      out_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      in_time: returnTime,
-      status: "APPROVED",
-      created_at: new Date().toISOString()
-    };
-    saveGatePass(newPass);
-    onAddGatePass(newPass);
-    setActivePass(newPass);
-    alert(`✓ Approved Digital Gate Pass!\nDestination: ${passType}\nReturn Deadline: ${returnTime}\n✓ Synced to Supabase Cloud & Scannable at Main Gate.`);
-  };
 
   const studentName = currentUser?.full_name || "Yathartha Nagaych";
   const studentRoll = currentUser?.roll_no_or_emp_id || "26bce123";
@@ -158,14 +120,6 @@ export default function StudentPortal({
             >
               <span className="material-symbols-outlined">calendar_month</span>
               <span>Timetable & Schedule</span>
-            </button>
-            <button
-              className={`nav-item ${activeTab === 'hostel' ? 'active' : ''}`}
-              onClick={() => setActiveTab('hostel')}
-            >
-              <span className="material-symbols-outlined">apartment</span>
-              <span>Hostel & Gate Pass</span>
-              <span className="nav-badge success">Active</span>
             </button>
             <button
               className={`nav-item ${activeTab === 'grades' ? 'active' : ''}`}
@@ -216,7 +170,6 @@ export default function StudentPortal({
                   {activeTab === 'dashboard' && "Student Dashboard"}
                   {activeTab === 'attendance' && "Academic Attendance & Course Register"}
                   {activeTab === 'timetable' && "Weekly Lecture Schedule"}
-                  {activeTab === 'hostel' && "Hostel Residency & Digital Outing"}
                   {activeTab === 'grades' && "Academic Grades & SGPA"}
                   {activeTab === 'notices' && "Official Circulars & Notices"}
                 </h2>
@@ -799,106 +752,7 @@ export default function StudentPortal({
               </section>
             )}
 
-            {/* SUB-TAB 4: HOSTEL & GATE PASS */}
-            {activeTab === 'hostel' && (
-              <section id="tab-hostel" className="tab-pane active">
-                <div className="grid-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}>
-                  {/* Gate Pass Form */}
-                  <div className="card">
-                    <div className="card-head">
-                      <div className="head-title">
-                        <span className="material-symbols-outlined">add_card</span>
-                        <h3>Request Digital Hostel Gate Pass</h3>
-                      </div>
-                      <span className="gate-status-pill">Kailash (KBH)</span>
-                    </div>
 
-                    <form onSubmit={handleGatePassSubmit} style={{ marginTop: "16px" }}>
-                      <div className="form-field" style={{ marginBottom: "14px" }}>
-                        <label style={{ display: "block", fontWeight: 600, marginBottom: "6px" }}>
-                          Outing Destination / Purpose:
-                        </label>
-                        <select
-                          value={passType}
-                          onChange={(e) => setPassType(e.target.value)}
-                          style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1" }}
-                        >
-                          <option value="Hamirpur Main Market (Stationery & Essentials)">Hamirpur Main Market (Stationery & Essentials)</option>
-                          <option value="Anu Chowk (Project Printing & Courier)">Anu Chowk (Project Printing & Courier)</option>
-                          <option value="Central Library Late Study Session">Central Library Late Study Session</option>
-                          <option value="Medical Emergency / Civil Hospital Hamirpur">Medical Emergency / Civil Hospital Hamirpur</option>
-                          <option value="Home Visit (Weekend Outstation Leave)">Home Visit (Weekend Outstation Leave)</option>
-                        </select>
-                      </div>
-
-                      <div className="form-field" style={{ marginBottom: "18px" }}>
-                        <label style={{ display: "block", fontWeight: 600, marginBottom: "6px" }}>
-                          Expected Return Time (Before 21:00 Mandatory):
-                        </label>
-                        <input
-                          type="time"
-                          value={returnTime}
-                          onChange={(e) => setReturnTime(e.target.value)}
-                          required
-                          style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1" }}
-                        />
-                      </div>
-
-                      <button type="submit" className="btn btn-primary btn-block" style={{ width: "100%", padding: "12px", justifyContent: "center" }}>
-                        <span className="material-symbols-outlined">qr_code_2</span>
-                        <span>Generate & Sync Digital Pass</span>
-                      </button>
-                    </form>
-                  </div>
-
-                  {/* Scannable Active Gate Pass Card */}
-                  <div className="card" style={{ background: "linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%)" }}>
-                    <div className="card-head">
-                      <div className="head-title">
-                        <span className="material-symbols-outlined">verified</span>
-                        <h3>Active Scannable Gate Pass</h3>
-                      </div>
-                      <span className="gate-status-pill" style={{ background: "#dcfce7", color: "#15803d" }}>
-                        ✓ {activePass?.status || 'APPROVED'}
-                      </span>
-                    </div>
-
-                    <div style={{ textAlign: "center", padding: "16px 0" }}>
-                      <div style={{ width: "150px", height: "150px", margin: "0 auto 16px auto", background: "#fff", padding: "12px", borderRadius: "12px", boxShadow: "var(--shadow-sm)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {/* Dynamic SVG QR Code */}
-                        <svg viewBox="0 0 100 100" width="126" height="126">
-                          <rect width="100" height="100" fill="white" />
-                          <path d="M10 10h30v30h-30zM50 10h10v10h-10zM70 10h20v20h-20zM10 50h10v10h-10zM30 50h20v20h-20zM70 40h20v10h-20zM10 70h30v20h-30zM50 70h20v20h-20zM80 70h10v20h-10z" fill="#0f2b5c" />
-                          <rect x="18" y="18" width="14" height="14" fill="white" />
-                          <rect x="22" y="22" width="6" height="6" fill="#0f2b5c" />
-                          <rect x="78" y="18" width="6" height="6" fill="#0f2b5c" />
-                          <rect x="18" y="76" width="14" height="14" fill="white" />
-                          <rect x="22" y="80" width="6" height="6" fill="#0f2b5c" />
-                        </svg>
-                      </div>
-
-                      <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--nith-navy)", fontFamily: "var(--font-mono)" }}>
-                        {activePass?.pass_number || "GP-2026-901"}
-                      </div>
-                      <div style={{ fontSize: "0.92rem", fontWeight: 700, marginTop: "4px" }}>
-                        {activePass?.student_name || studentName} ({activePass?.student_roll_no || studentRoll})
-                      </div>
-                      <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "6px" }}>
-                        Hostel: {activePass?.hostel_name || "Kailash Boys Hostel"} • Room: {activePass?.room_no || "B-214"}
-                      </p>
-                      <div style={{ marginTop: "12px", padding: "8px 14px", background: "#fff", borderRadius: "8px", display: "inline-block", fontSize: "0.85rem", width: "100%", maxWidth: "340px", textAlign: "left" }}>
-                        <div><strong>Destination:</strong> {activePass?.destination || passType}</div>
-                        <div><strong>Return By:</strong> {activePass?.in_time || "Today, 20:30"}</div>
-                        <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px dashed #cbd5e1", fontSize: "0.76rem", color: "#15803d", display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>document_scanner</span>
-                          <span><strong>PaliGemma 4 Multimodal Vision Verified</strong> (google/paligemma-4-pt-448 • Token: <code>KBH-NITH-26BCE</code>)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
 
             {/* SUB-TAB 5: GRADES & SGPA */}
             {activeTab === 'grades' && (
@@ -1001,9 +855,9 @@ export default function StudentPortal({
                         color: "#b91c1c"
                       },
                       {
-                        title: "Guidelines for Digital Hostel Outing & Gate Pass Scanners at NIT Hamirpur Main Gate",
+                        title: "Guidelines for End-Term Examination Schedule & Central Library Extended Hours",
                         date: "05 Oct 2026",
-                        tag: "Hostel Directorate",
+                        tag: "Academic Directorate",
                         color: "#0369a1"
                       },
                       {

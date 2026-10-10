@@ -32,20 +32,6 @@ export interface DepartmentInfo {
   timetable: Record<string, TimetableSlot[]>;
 }
 
-export interface GatePass {
-  id: string;
-  pass_number: string;
-  student_roll_no: string;
-  student_name: string;
-  hostel_name: string;
-  room_no: string;
-  destination: string;
-  out_time: string;
-  in_time: string;
-  status: string;
-  created_at: string;
-}
-
 export interface UserAccount {
   id: string;
   email: string;
@@ -578,11 +564,6 @@ export const INITIAL_USERS: UserAccount[] = [
   { id: "u-102", email: "26bcs042@nith.ac.in", full_name: "Aman Sharma", role: "student", roll_no_or_emp_id: "26BCS042", is_verified: true, created_at: new Date(Date.now() - 86400000 * 4).toISOString() },
   { id: "u-103", email: "rksharma@nith.ac.in", full_name: "Prof. R. K. Sharma", role: "staff", roll_no_or_emp_id: "EMP-4091", is_verified: true, created_at: new Date(Date.now() - 86400000 * 12).toISOString() },
   { id: "u-104", email: "naveenchauhan@nith.ac.in", full_name: "Dr. Naveen Chauhan", role: "staff", roll_no_or_emp_id: "EMP-3088", is_verified: true, created_at: new Date(Date.now() - 86400000 * 15).toISOString() }
-];
-
-export const INITIAL_GATE_PASSES: GatePass[] = [
-  { id: "gp-901", pass_number: "GP-2026-901", student_roll_no: "26bce123", student_name: "Yathartha Nagaych", hostel_name: "Kailash Boys Hostel", room_no: "B-214", destination: "Hamirpur Main Market (Stationery)", out_time: "17:00", in_time: "20:30", status: "APPROVED", created_at: new Date(Date.now() - 3600000 * 2).toISOString() },
-  { id: "gp-902", pass_number: "GP-2026-902", student_roll_no: "26BCS042", student_name: "Aman Sharma", hostel_name: "Kailash Boys Hostel", room_no: "B-108", destination: "Anu Chowk (Project Printouts)", out_time: "16:30", in_time: "19:45", status: "APPROVED", created_at: new Date(Date.now() - 3600000 * 5).toISOString() }
 ];
 
 export const INITIAL_ATTENDANCE: AttendanceRecord[] = [

@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { UserAccount, GatePass, AttendanceRecord, SyllabusRecord } from "@/lib/data";
+import { UserAccount, AttendanceRecord, SyllabusRecord } from "@/lib/data";
 import { DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY } from "@/lib/supabaseClient";
 
 interface SupabaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   users: UserAccount[];
-  gatePasses: GatePass[];
   attendance: AttendanceRecord[];
   syllabus: SyllabusRecord[];
   onConfigChange: (url: string, key: string) => void;
@@ -19,7 +18,6 @@ export default function SupabaseModal({
   isOpen,
   onClose,
   users,
-  gatePasses,
   attendance,
   syllabus,
   onConfigChange,
@@ -39,7 +37,7 @@ export default function SupabaseModal({
     return DEFAULT_SUPABASE_ANON_KEY;
   });
   const [copied, setCopied] = useState(false);
-  const [selectedTable, setSelectedTable] = useState<'users' | 'passes' | 'attendance' | 'syllabus'>('users');
+  const [selectedTable, setSelectedTable] = useState<'users' | 'attendance' | 'syllabus'>('users');
 
   if (!isOpen) return null;
 
@@ -94,23 +92,7 @@ CREATE TABLE IF NOT EXISTS nith_users (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Digital Hostel Gate Passes (Kailash & Dhauladhar Hostels)
-CREATE TABLE IF NOT EXISTS nith_gate_passes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    pass_number TEXT UNIQUE NOT NULL,
-    student_roll_no TEXT NOT NULL,
-    student_name TEXT NOT NULL,
-    hostel_name TEXT NOT NULL,
-    room_no TEXT,
-    destination TEXT NOT NULL,
-    out_time TIMESTAMPTZ NOT NULL,
-    in_time TIMESTAMPTZ NOT NULL,
-    status TEXT DEFAULT 'APPROVED',
-    qr_code_data TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 3. Academic 75% Attendance Compliance
+-- 2. Academic 75% Attendance Compliance
 CREATE TABLE IF NOT EXISTS nith_attendance (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_roll_no TEXT NOT NULL,
@@ -123,7 +105,7 @@ CREATE TABLE IF NOT EXISTS nith_attendance (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Faculty Syllabus Completion & Quiz Management
+-- 3. Faculty Syllabus Completion & Quiz Management
 CREATE TABLE IF NOT EXISTS nith_syllabus (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     course_code TEXT NOT NULL,
@@ -203,11 +185,11 @@ CREATE TABLE IF NOT EXISTS nith_syllabus (
           </div>
           <div className="supabase-stat-card">
             <div className="stat-icon-wrap pass-stat">
-              <span className="material-symbols-outlined">qr_code_scanner</span>
+              <span className="material-symbols-outlined">domain</span>
             </div>
             <div className="stat-info">
-              <span className="stat-num">{gatePasses.length}</span>
-              <span className="stat-label">nith_gate_passes</span>
+              <span className="stat-num">7</span>
+              <span className="stat-label">nith_departments</span>
             </div>
           </div>
           <div className="supabase-stat-card">
@@ -261,7 +243,7 @@ CREATE TABLE IF NOT EXISTS nith_syllabus (
             <div className="supabase-config-form">
               <div className="form-instruction">
                 <p>
-                  Connect your custom <strong>Supabase Project</strong> or use the built-in NITH cloud storage endpoint. All OTP registrations, digital hostel passes, and attendance logs sync directly to Supabase.
+                  Connect your custom <strong>Supabase Project</strong> or use the built-in NITH cloud storage endpoint. All OTP registrations, academic syllabus records, and attendance logs sync directly to Supabase.
                 </p>
               </div>
               <div className="input-field-group">
@@ -328,23 +310,7 @@ CREATE TABLE IF NOT EXISTS nith_users (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Digital Hostel Gate Passes (Kailash & Dhauladhar Hostels)
-CREATE TABLE IF NOT EXISTS nith_gate_passes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    pass_number TEXT UNIQUE NOT NULL,
-    student_roll_no TEXT NOT NULL,
-    student_name TEXT NOT NULL,
-    hostel_name TEXT NOT NULL,
-    room_no TEXT,
-    destination TEXT NOT NULL,
-    out_time TIMESTAMPTZ NOT NULL,
-    in_time TIMESTAMPTZ NOT NULL,
-    status TEXT DEFAULT 'APPROVED',
-    qr_code_data TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 3. Academic 75% Attendance Compliance
+-- 2. Academic 75% Attendance Compliance
 CREATE TABLE IF NOT EXISTS nith_attendance (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_roll_no TEXT NOT NULL,
@@ -357,7 +323,7 @@ CREATE TABLE IF NOT EXISTS nith_attendance (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Faculty Syllabus Completion & Quiz Management
+-- 3. Faculty Syllabus Completion & Quiz Management
 CREATE TABLE IF NOT EXISTS nith_syllabus (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     course_code TEXT NOT NULL,
@@ -381,7 +347,6 @@ CREATE TABLE IF NOT EXISTS nith_syllabus (
                 onChange={(e) => setSelectedTable(e.target.value as any)}
               >
                 <option value="users">nith_users (Accounts)</option>
-                <option value="passes">nith_gate_passes (Hostel Passes)</option>
                 <option value="attendance">nith_attendance (75% Attendance)</option>
                 <option value="syllabus">nith_syllabus (Faculty Syllabus)</option>
               </select>
@@ -407,31 +372,6 @@ CREATE TABLE IF NOT EXISTS nith_syllabus (
                         <td style={{ padding: "8px" }}>{u.role}</td>
                         <td style={{ padding: "8px" }}>{u.roll_no_or_emp_id}</td>
                         <td style={{ padding: "8px", color: "#15803d" }}>✓ True</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-
-              {selectedTable === 'passes' && (
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.84rem" }}>
-                  <thead>
-                    <tr style={{ background: "#f1f5f9", textAlign: "left" }}>
-                      <th style={{ padding: "8px" }}>Pass #</th>
-                      <th style={{ padding: "8px" }}>Student</th>
-                      <th style={{ padding: "8px" }}>Hostel</th>
-                      <th style={{ padding: "8px" }}>Destination</th>
-                      <th style={{ padding: "8px" }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {gatePasses.map(p => (
-                      <tr key={p.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
-                        <td style={{ padding: "8px", fontWeight: 700 }}>{p.pass_number}</td>
-                        <td style={{ padding: "8px" }}>{p.student_name} ({p.student_roll_no})</td>
-                        <td style={{ padding: "8px" }}>{p.hostel_name}</td>
-                        <td style={{ padding: "8px" }}>{p.destination}</td>
-                        <td style={{ padding: "8px", color: "#15803d" }}>{p.status}</td>
                       </tr>
                     ))}
                   </tbody>

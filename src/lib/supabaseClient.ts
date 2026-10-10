@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { UserAccount, GatePass, AttendanceRecord, SyllabusRecord, INITIAL_USERS, INITIAL_GATE_PASSES, INITIAL_ATTENDANCE, INITIAL_SYLLABUS } from './data';
+import { UserAccount, AttendanceRecord, SyllabusRecord, INITIAL_USERS, INITIAL_ATTENDANCE, INITIAL_SYLLABUS } from './data';
 
 export const DEFAULT_SUPABASE_URL = "https://nith-is-production.supabase.co";
 export const DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pdGgtaXMiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczODQ4MDAwMCwiZXhwIjoyMDU0MDQ4MDAwfQ.mock_signature_nith_is";
@@ -84,34 +84,6 @@ export function saveUserAccount(user: UserAccount) {
   if (client) {
     client.from('nith_users').upsert([user]).then(res => {
       if (res.error) console.log("Supabase user sync buffer:", res.error.message);
-    });
-  }
-}
-
-export function loadStoredGatePasses(): GatePass[] {
-  if (typeof window === 'undefined') return INITIAL_GATE_PASSES;
-  const raw = localStorage.getItem("NITH_DB_GATE_PASSES");
-  if (!raw) {
-    localStorage.setItem("NITH_DB_GATE_PASSES", JSON.stringify(INITIAL_GATE_PASSES));
-    return INITIAL_GATE_PASSES;
-  }
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return INITIAL_GATE_PASSES;
-  }
-}
-
-export function saveGatePass(pass: GatePass) {
-  if (typeof window === 'undefined') return;
-  const passes = loadStoredGatePasses();
-  passes.unshift(pass);
-  localStorage.setItem("NITH_DB_GATE_PASSES", JSON.stringify(passes));
-
-  const client = getSupabaseClient();
-  if (client) {
-    client.from('nith_gate_passes').insert([pass]).then(res => {
-      if (res.error) console.log("Supabase gate pass buffer:", res.error.message);
     });
   }
 }

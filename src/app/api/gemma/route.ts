@@ -203,19 +203,19 @@ vector&lt;int&gt; dijkstra(int V, vector&lt;vector&lt;pii&gt;&gt;&amp; adj, int 
         `;
       }
     } else if (modelKey === "gemma-4-vision" || modelKey === "paligemma") {
-      // PALIGEMMA 4: Multimodal Vision, Gate Pass QR & Student ID OCR
+      // PALIGEMMA 4: Multimodal Vision, Student ID OCR & Document Verification
       responseHtml = `
         <div class="gemma-engine-result paligemma-theme">
           <div class="result-model-badge">👁️ <strong>PaliGemma 4 Vision</strong> • Hugging Face: <code>${weightInfo.huggingFace.repoId}</code> • Kaggle: <code>${weightInfo.kaggle.handle}</code></div>
-          <h4>Multimodal Gate Pass & Hostel QR Matrix Verification</h4>
+          <h4>Multimodal Student ID & Examination Hall Permit OCR</h4>
           <div style="background:#f0fdf4; border:1px solid #86efac; padding:12px; border-radius:8px; margin:8px 0;">
             <strong style="color:#15803d;">✓ PaliGemma 4 SigLIP-2 Vision Tokens Validated (Score: 99.8%)</strong>
             <table style="width:100%; font-size:0.8rem; margin-top:8px; border-collapse:collapse;">
               <tr><td style="color:#4b5563;">VLM Architecture:</td><td><strong>SigLIP-2 So400m + Gemma 4 2B Decoder</strong></td></tr>
               <tr><td style="color:#4b5563;">Verified Identity:</td><td><strong>26BCE123 • Yathartha Nagaych (Civil Engg)</strong></td></tr>
-              <tr><td style="color:#4b5563;">Hostel Block:</td><td><strong>Kailash Boys Hostel (KBH-314)</strong></td></tr>
-              <tr><td style="color:#4b5563;">Digital Gate Matrix:</td><td><span style="color:#16a34a; font-weight:700;">Valid Signed Institutional QR Watermark</span></td></tr>
-              <tr><td style="color:#4b5563;">Outing Status:</td><td>Permitted until 20:30 IST (Roll Call)</td></tr>
+              <tr><td style="color:#4b5563;">Department:</td><td><strong>Civil Engineering • Vivekananda LH Complex</strong></td></tr>
+              <tr><td style="color:#4b5563;">Verification Matrix:</td><td><span style="color:#16a34a; font-weight:700;">Valid Institutional QR & Photo Watermark</span></td></tr>
+              <tr><td style="color:#4b5563;">Examination Clearance:</td><td>75% Attendance Satisfied (Ordinance 7.2 Clear)</td></tr>
             </table>
           </div>
           <div class="weights-source-card" style="margin-top:8px; padding:8px 10px; background:#f8fafc; border-radius:6px; font-size:0.75rem;">

@@ -57,7 +57,7 @@ export default function HomeView({
     if (e) e.preventDefault();
     const q = searchQuery.trim().toLowerCase();
     if (!q) {
-      alert("Please enter a roll number, course code, faculty name, or keyword (e.g., '22BCSE101', 'attendance', 'hostel', 'fees').");
+      alert("Please enter a roll number, course code, faculty name, or keyword (e.g., '22BCSE101', 'attendance', 'timetable', 'fees').");
       return;
     }
 
@@ -71,8 +71,7 @@ export default function HomeView({
       q.includes("bcs") ||
       q.includes("attendance") ||
       q.includes("bunk") ||
-      q.includes("gate") ||
-      q.includes("pass") ||
+      q.includes("timetable") ||
       q.includes("fee") ||
       q.includes("sgpa") ||
       q.includes("grade")
@@ -142,7 +141,7 @@ export default function HomeView({
           <h1 className="zomato-hero-title">NITH-IS</h1>
 
           <p className="zomato-hero-subtitle">
-            Informatics System • Real-time 75% attendance compliance, digital hostel QR gate passes, faculty syllabus registers & admissions
+            Informatics System • Real-time 75% attendance compliance, lecture hall mapping, faculty syllabus registers & admissions
           </p>
 
           {/* Zomato-Style Search & Gateway Finder */}
@@ -152,7 +151,7 @@ export default function HomeView({
               <input
                 type="text"
                 id="zomatoSearchInput"
-                placeholder="Search roll number, course, 75% attendance, hostel pass, syllabus, faculty..."
+                placeholder="Search roll number, course, 75% attendance, timetable, syllabus, faculty..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -256,7 +255,7 @@ export default function HomeView({
                   <h3>Student Login</h3>
                 </div>
                 <p className="card-desc">
-                  75% Attendance Compliance Dashboard, Faculty-Synced Registry, Timetable, Digital Hostel QR Gate Pass, Fee Receipts & SGPA Grade Cards.
+                  75% Attendance Compliance Dashboard, Faculty-Synced Registry, Timetable, Examination Schedule, Fee Receipts & SGPA Grade Cards.
                 </p>
                 <div className="card-footer-cta">
                   <span>Access Student Portal</span>
@@ -343,7 +342,7 @@ export default function HomeView({
               <span className="material-symbols-outlined gemma-icon-sparkle">auto_awesome</span>
               <div>
                 <strong>Powered by Google Gemma 4:</strong>
-                <span>Ask Gemma 4 about Attendance Ordinance 7.2, Timetable Schedules, Dijkstra Algorithms, Gate Passes, or Exam Notes</span>
+                <span>Ask Gemma 4 about Attendance Ordinance 7.2, Timetable Schedules, Dijkstra Algorithms, Examination Registers, or Exam Notes</span>
               </div>
             </div>
             <div className="gemma-strip-btn">
