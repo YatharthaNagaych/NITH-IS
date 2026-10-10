@@ -48,3 +48,17 @@ npm run dev
 npm run build
 npm run start
 ```
+
+---
+
+## 👥 Contributors & Core Team
+
+- **[@YatharthaNagaych](https://github.com/YatharthaNagaych)** (Lead Developer & Maintainer)
+- **[@naitikgarg780](https://github.com/naitikgarg780)** (Contributor)
+- **[@tanuj1037](https://github.com/tanuj1037)** (Contributor)
+- **[@sprezzatura-20](https://github.com/sprezzatura-20)** (Contributor)
+
+---
+
+## 📄 License
+This project is licensed under the [Apache License 2.0](LICENSE).
