@@ -10,6 +10,12 @@ import {
   loadQuizzes,
   QuizItem
 } from "@/lib/attendanceStore";
+import {
+  AssignmentItem,
+  StudentSubmission,
+  getStudentAssignments,
+  saveSubmission
+} from "@/lib/assignmentStore";
 
 interface StudentPortalProps {
   onNavigateHome: () => void;
@@ -30,7 +36,7 @@ export default function StudentPortal({
   courses,
   currentUser,
 }: StudentPortalProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'attendance' | 'timetable' | 'grades' | 'notices' | 'codegemma'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'attendance' | 'timetable' | 'assignments' | 'grades' | 'notices' | 'codegemma'>('dashboard');
   const [activeDay, setActiveDay] = useState<string>("Wed");
   const [scheduleViewMode, setScheduleViewMode] = useState<'timeline' | 'matrix'>('timeline');
 
@@ -52,23 +58,81 @@ export default function StudentPortal({
   );
   const [quizzes, setQuizzes] = useState<QuizItem[]>(() => loadQuizzes());
 
+  // Course Assignments & Laboratory Submissions State
+  const studentIdentifier = currentUser?.roll_no_or_emp_id || currentUser?.email || "26bce123";
+  const [studentAssignments, setStudentAssignments] = useState(() => getStudentAssignments(studentIdentifier));
+  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'pending' | 'submitted' | 'graded'>('all');
+
+  // Student Submission Modal State
+  const [submittingAssignment, setSubmittingAssignment] = useState<AssignmentItem | null>(null);
+  const [viewingSubmission, setViewingSubmission] = useState<{ asg: AssignmentItem; sub: StudentSubmission } | null>(null);
+  const [submitText, setSubmitText] = useState("");
+  const [submitCode, setSubmitCode] = useState("");
+  const [submitAttachmentUrl, setSubmitAttachmentUrl] = useState("");
+  const [submitFileName, setSubmitFileName] = useState("");
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+
   useEffect(() => {
     const handleSync = () => {
-      const att = computeStudentAttendance(currentUser?.roll_no_or_emp_id || currentUser?.email);
+      const currentId = currentUser?.roll_no_or_emp_id || currentUser?.email || "26bce123";
+      const att = computeStudentAttendance(currentId);
       setStudentAtt(att);
       setLectureSessions(loadLectureSessions());
       setQuizzes(loadQuizzes());
+      setStudentAssignments(getStudentAssignments(currentId));
     };
     handleSync();
     window.addEventListener("storage", handleSync);
     window.addEventListener("nith_attendance_updated", handleSync);
     window.addEventListener("nith_quiz_updated", handleSync);
+    window.addEventListener("nith_assignment_sync", handleSync);
     return () => {
       window.removeEventListener("storage", handleSync);
       window.removeEventListener("nith_attendance_updated", handleSync);
       window.removeEventListener("nith_quiz_updated", handleSync);
+      window.removeEventListener("nith_assignment_sync", handleSync);
     };
   }, [currentUser]);
+
+  const handleOpenSubmitModal = (asg: AssignmentItem) => {
+    setSubmittingAssignment(asg);
+    setSubmitText("");
+    setSubmitCode("");
+    setSubmitAttachmentUrl("");
+    setSubmitFileName("");
+    setSubmitMessage(null);
+  };
+
+  const handleStudentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!submittingAssignment) return;
+    if (!submitText.trim() && !submitCode.trim() && !submitAttachmentUrl.trim() && !submitFileName.trim()) {
+      alert("Please enter your solution text, paste code, or attach a file.");
+      return;
+    }
+
+    const newSub: StudentSubmission = {
+      id: `sub-${Date.now()}`,
+      assignmentId: submittingAssignment.id,
+      studentRollNo: studentRoll,
+      studentName: studentName,
+      studentEmail: currentUser?.email || `${studentRoll.toLowerCase()}@nith.ac.in`,
+      submissionText: submitText.trim(),
+      codeSnippet: submitCode.trim() || undefined,
+      attachmentUrl: submitAttachmentUrl.trim() || undefined,
+      attachmentFileName: submitFileName.trim() || (submitAttachmentUrl.trim() ? "external_submission_link" : undefined),
+      submittedAt: new Date().toISOString(),
+      status: 'submitted'
+    };
+
+    saveSubmission(newSub);
+    setStudentAssignments(getStudentAssignments(studentRoll));
+    setSubmitMessage("✓ Assignment successfully submitted to " + submittingAssignment.facultyName + "!");
+    setTimeout(() => {
+      setSubmittingAssignment(null);
+      setSubmitMessage(null);
+    }, 1500);
+  };
 
   const overallPct = studentAtt.overallPercentage;
   const isOverallSafe = overallPct >= 75;
@@ -122,6 +186,18 @@ export default function StudentPortal({
               <span>Timetable & Schedule</span>
             </button>
             <button
+              className={`nav-item ${activeTab === 'assignments' ? 'active' : ''}`}
+              onClick={() => setActiveTab('assignments')}
+            >
+              <span className="material-symbols-outlined">assignment</span>
+              <span>Assignments & Labs</span>
+              {studentAssignments.filter(a => a.isPending).length > 0 && (
+                <span className="nav-badge" style={{ background: "#ea580c", color: "#fff", fontWeight: 700 }}>
+                  {studentAssignments.filter(a => a.isPending).length} Due
+                </span>
+              )}
+            </button>
+            <button
               className={`nav-item ${activeTab === 'grades' ? 'active' : ''}`}
               onClick={() => setActiveTab('grades')}
             >
@@ -170,8 +246,10 @@ export default function StudentPortal({
                   {activeTab === 'dashboard' && "Student Dashboard"}
                   {activeTab === 'attendance' && "Academic Attendance & Course Register"}
                   {activeTab === 'timetable' && "Weekly Lecture Schedule"}
+                  {activeTab === 'assignments' && "Course Assignments & Laboratory Submissions"}
                   {activeTab === 'grades' && "Academic Grades & SGPA"}
                   {activeTab === 'notices' && "Official Circulars & Notices"}
+                  {activeTab === 'codegemma' && "CodeGemma AI Engineering Laboratory"}
                 </h2>
                 <p>National Institute of Technology Hamirpur (H.P.)</p>
               </div>
@@ -404,6 +482,84 @@ export default function StudentPortal({
                         })()}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+
+                {/* Course Assignments Overview Widget */}
+                <div className="card" style={{ marginTop: "24px" }}>
+                  <div className="card-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div className="head-title">
+                      <span className="material-symbols-outlined" style={{ color: "var(--nith-navy)" }}>assignment</span>
+                      <h3>Active Course Assignments & Lab Work</h3>
+                    </div>
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => setActiveTab('assignments')}
+                      style={{ padding: "6px 14px", fontSize: "0.82rem" }}
+                    >
+                      <span>View All & Submit</span>
+                      <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>arrow_forward</span>
+                    </button>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px", marginTop: "16px" }}>
+                    {studentAssignments.slice(0, 3).map(({ assignment: asg, submission: sub, isPending, status }) => (
+                      <div
+                        key={asg.id}
+                        style={{
+                          background: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "10px",
+                          padding: "16px",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between"
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "0.75rem", fontWeight: 700, background: "#e2e8f0", padding: "2px 8px", borderRadius: "4px" }}>
+                              {asg.courseCode}
+                            </span>
+                            <span style={{
+                              fontSize: "0.72rem",
+                              fontWeight: 700,
+                              padding: "2px 8px",
+                              borderRadius: "4px",
+                              background: status === 'graded' ? "#dcfce7" : (status === 'submitted' ? "#dbeafe" : "#ffedd5"),
+                              color: status === 'graded' ? "#15803d" : (status === 'submitted' ? "#1d4ed8" : "#c2410c")
+                            }}>
+                              {status === 'graded' ? `✓ Graded (${sub?.marksObtained}/${asg.maxMarks})` : (status === 'submitted' ? "Submitted" : "Pending Due")}
+                            </span>
+                          </div>
+
+                          <h4 style={{ margin: "4px 0 6px 0", fontSize: "0.92rem", color: "var(--nith-navy)" }}>{asg.title}</h4>
+                          <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--text-muted)" }}>👨‍🏫 {asg.facultyName} • Due: {new Date(asg.dueDate).toLocaleDateString()}</p>
+                        </div>
+
+                        <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px dashed #cbd5e1" }}>
+                          {isPending ? (
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => { setActiveTab('assignments'); handleOpenSubmitModal(asg); }}
+                              style={{ width: "100%", padding: "6px 12px", fontSize: "0.8rem", justifyContent: "center" }}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>upload</span>
+                              <span>Submit Solution</span>
+                            </button>
+                          ) : sub ? (
+                            <button
+                              className="btn btn-outline"
+                              onClick={() => { setActiveTab('assignments'); setViewingSubmission({ asg, sub }); }}
+                              style={{ width: "100%", padding: "6px 12px", fontSize: "0.8rem", justifyContent: "center" }}
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>visibility</span>
+                              <span>{status === 'graded' ? "View Grade & Feedback" : "View Submission"}</span>
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </section>
@@ -753,6 +909,587 @@ export default function StudentPortal({
             )}
 
 
+            {/* SUB-TAB 4: ASSIGNMENTS & LABORATORY SUBMISSIONS */}
+            {activeTab === 'assignments' && (
+              <section id="tab-assignments" className="tab-pane active">
+                {/* Header Banner */}
+                <div className="card" style={{ marginBottom: "20px" }}>
+                  <div className="card-head">
+                    <div className="head-title">
+                      <span className="material-symbols-outlined" style={{ color: "var(--nith-navy)", fontSize: "28px" }}>assignment_turned_in</span>
+                      <div>
+                        <h3 style={{ margin: 0, fontSize: "1.2rem" }}>Course Assignments & Laboratory Submissions</h3>
+                        <p style={{ margin: "4px 0 0 0", fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                          Official student submission gateway for NIT Hamirpur course curriculum. Submit homework solutions, C++/Python lab code, and project reports directly to your professors.
+                        </p>
+                      </div>
+                    </div>
+                    <span className="gate-status-pill" style={{ background: "#e0f2fe", color: "#0369a1" }}>
+                      Academic Session 2026
+                    </span>
+                  </div>
+
+                  {/* Summary Metric Counters */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginTop: "18px" }}>
+                    <div style={{ background: "#f8fafc", padding: "14px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 600 }}>TOTAL ASSIGNED</div>
+                      <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--nith-navy)", marginTop: "4px" }}>
+                        {studentAssignments.length}
+                      </div>
+                    </div>
+                    <div style={{ background: "#fff7ed", padding: "14px", borderRadius: "10px", border: "1px solid #ffedd5" }}>
+                      <div style={{ fontSize: "0.78rem", color: "#c2410c", fontWeight: 600 }}>PENDING SUBMISSION</div>
+                      <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#ea580c", marginTop: "4px" }}>
+                        {studentAssignments.filter(a => a.isPending).length}
+                      </div>
+                    </div>
+                    <div style={{ background: "#eff6ff", padding: "14px", borderRadius: "10px", border: "1px solid #dbeafe" }}>
+                      <div style={{ fontSize: "0.78rem", color: "#1d4ed8", fontWeight: 600 }}>SUBMITTED / IN REVIEW</div>
+                      <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#2563eb", marginTop: "4px" }}>
+                        {studentAssignments.filter(a => a.isSubmitted && a.status !== 'graded').length}
+                      </div>
+                    </div>
+                    <div style={{ background: "#f0fdf4", padding: "14px", borderRadius: "10px", border: "1px solid #bbf7d0" }}>
+                      <div style={{ fontSize: "0.78rem", color: "#15803d", fontWeight: 600 }}>GRADED & EVALUATED</div>
+                      <div style={{ fontSize: "1.6rem", fontWeight: 800, color: "#16a34a", marginTop: "4px" }}>
+                        {studentAssignments.filter(a => a.status === 'graded').length}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Filter Pills */}
+                  <div style={{ display: "flex", gap: "8px", marginTop: "18px", borderTop: "1px solid #f1f5f9", paddingTop: "14px" }}>
+                    {[
+                      { key: 'all', label: `All Tasks (${studentAssignments.length})` },
+                      { key: 'pending', label: `Pending Due (${studentAssignments.filter(a => a.isPending).length})` },
+                      { key: 'submitted', label: `Submitted (${studentAssignments.filter(a => a.isSubmitted && a.status !== 'graded').length})` },
+                      { key: 'graded', label: `Graded (${studentAssignments.filter(a => a.status === 'graded').length})` },
+                    ].map(tab => (
+                      <button
+                        key={tab.key}
+                        onClick={() => setAssignmentFilter(tab.key as any)}
+                        style={{
+                          padding: "6px 14px",
+                          borderRadius: "20px",
+                          fontSize: "0.82rem",
+                          fontWeight: 600,
+                          border: assignmentFilter === tab.key ? "1px solid var(--nith-navy)" : "1px solid #e2e8f0",
+                          background: assignmentFilter === tab.key ? "var(--nith-navy)" : "#fff",
+                          color: assignmentFilter === tab.key ? "#fff" : "#475569",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease"
+                        }}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Assignments List Cards */}
+                <div className="card">
+                  <div className="card-head">
+                    <div className="head-title">
+                      <span className="material-symbols-outlined">assignment</span>
+                      <h3>Your Course Assignment Stream</h3>
+                    </div>
+                    <span className="gate-status-pill" style={{ background: "#ede9fe", color: "#6d28d9" }}>
+                      Roll: {studentRoll}
+                    </span>
+                  </div>
+
+                  {(() => {
+                    const filtered = studentAssignments.filter(item => {
+                      if (assignmentFilter === 'pending') return item.isPending;
+                      if (assignmentFilter === 'submitted') return item.isSubmitted && item.status !== 'graded';
+                      if (assignmentFilter === 'graded') return item.status === 'graded';
+                      return true;
+                    });
+
+                    if (filtered.length === 0) {
+                      return (
+                        <div style={{ textAlign: "center", padding: "40px 20px", color: "var(--text-muted)" }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: "44px", opacity: 0.5 }}>task_alt</span>
+                          <p style={{ marginTop: "10px", fontSize: "0.95rem" }}>
+                            {assignmentFilter === 'pending' ? "No pending assignments due! Great work staying ahead." : "No assignments match this filter."}
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "20px", marginTop: "16px" }}>
+                        {filtered.map(({ assignment: asg, submission: sub, isPending, isOverdue, status }) => {
+                          const dueDateObj = new Date(asg.dueDate);
+                          const isDueSoon = !isOverdue && isPending && (dueDateObj.getTime() - Date.now() < 86400000 * 3);
+
+                          return (
+                            <div
+                              key={asg.id}
+                              style={{
+                                background: "#fff",
+                                border: status === 'graded' ? "1px solid #86efac" : "1px solid #e2e8f0",
+                                borderRadius: "12px",
+                                padding: "20px",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-between",
+                                boxShadow: "0 2px 4px rgba(0,0,0,0.03)"
+                              }}
+                            >
+                              <div>
+                                {/* Card Header */}
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px", marginBottom: "8px" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <span style={{
+                                      background: "var(--nith-navy)",
+                                      color: "#fff",
+                                      fontWeight: 700,
+                                      fontSize: "0.78rem",
+                                      padding: "3px 10px",
+                                      borderRadius: "6px"
+                                    }}>
+                                      {asg.courseCode}
+                                    </span>
+                                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>
+                                      {asg.courseName}
+                                    </span>
+                                  </div>
+
+                                  {/* Status Pill */}
+                                  <span style={{
+                                    fontSize: "0.74rem",
+                                    fontWeight: 700,
+                                    padding: "3px 8px",
+                                    borderRadius: "4px",
+                                    background: status === 'graded' ? "#dcfce7" : (status === 'submitted' ? "#dbeafe" : (isOverdue ? "#fee2e2" : "#ffedd5")),
+                                    color: status === 'graded' ? "#15803d" : (status === 'submitted' ? "#1d4ed8" : (isOverdue ? "#b91c1c" : "#c2410c"))
+                                  }}>
+                                    {status === 'graded'
+                                      ? `✓ Evaluated (${sub?.marksObtained}/${asg.maxMarks})`
+                                      : (status === 'submitted'
+                                        ? "Submitted (In Review)"
+                                        : (isOverdue ? "Deadline Passed" : "Pending Due"))}
+                                  </span>
+                                </div>
+
+                                <h4 style={{ margin: "10px 0 6px 0", fontSize: "1.08rem", color: "var(--nith-navy)", lineHeight: 1.3 }}>
+                                  {asg.title}
+                                </h4>
+
+                                <div style={{ fontSize: "0.8rem", color: "#475569", marginBottom: "10px" }}>
+                                  👨‍🏫 <strong>Instructor:</strong> {asg.facultyName}
+                                </div>
+
+                                <div style={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: "14px",
+                                  fontSize: "0.78rem",
+                                  background: "#f8fafc",
+                                  padding: "8px 12px",
+                                  borderRadius: "6px",
+                                  marginBottom: "12px"
+                                }}>
+                                  <span>
+                                    <strong>Due:</strong> {dueDateObj.toLocaleDateString()} {dueDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {isDueSoon && <span style={{ color: "#ea580c", fontWeight: 700, marginLeft: "4px" }}>(Due Soon)</span>}
+                                  </span>
+                                  <span><strong>Max Marks:</strong> {asg.maxMarks}</span>
+                                </div>
+
+                                <p style={{
+                                  fontSize: "0.84rem",
+                                  color: "var(--text-muted)",
+                                  margin: "0 0 14px 0",
+                                  lineHeight: 1.4
+                                }}>
+                                  {asg.description}
+                                </p>
+
+                                {asg.attachmentUrl && (
+                                  <div style={{ marginBottom: "14px" }}>
+                                    <a
+                                      href={asg.attachmentUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "4px",
+                                        fontSize: "0.78rem",
+                                        color: "#2563eb",
+                                        textDecoration: "none",
+                                        background: "#eff6ff",
+                                        padding: "4px 10px",
+                                        borderRadius: "6px"
+                                      }}
+                                    >
+                                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>description</span>
+                                      <span>Reference Problem Sheet & Manual</span>
+                                    </a>
+                                  </div>
+                                )}
+
+                                {/* If Graded: Show Evaluation Result Box */}
+                                {status === 'graded' && sub && (
+                                  <div style={{
+                                    background: "#f0fdf4",
+                                    border: "1px solid #86efac",
+                                    borderRadius: "8px",
+                                    padding: "12px",
+                                    marginBottom: "14px"
+                                  }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                                      <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#166534" }}>
+                                        EVALUATION RESULT
+                                      </span>
+                                      <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#15803d" }}>
+                                        {sub.marksObtained} / {asg.maxMarks} Marks ({Math.round(((sub.marksObtained || 0) / asg.maxMarks) * 100)}%)
+                                      </span>
+                                    </div>
+                                    <div style={{ fontSize: "0.8rem", color: "#166534", fontStyle: "italic", marginTop: "4px" }}>
+                                      "{sub.feedback || "Evaluated by course faculty."}"
+                                    </div>
+                                    <div style={{ fontSize: "0.72rem", color: "#475569", marginTop: "6px" }}>
+                                      Evaluated by: {sub.gradedBy || asg.facultyName}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* If Submitted: Show Confirmation Box */}
+                                {status === 'submitted' && sub && (
+                                  <div style={{
+                                    background: "#eff6ff",
+                                    border: "1px solid #bfdbfe",
+                                    borderRadius: "8px",
+                                    padding: "10px 12px",
+                                    marginBottom: "14px",
+                                    fontSize: "0.8rem",
+                                    color: "#1e40af"
+                                  }}>
+                                    ✓ Solution submitted on {new Date(sub.submittedAt).toLocaleDateString()} {new Date(sub.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Awaiting professor review.
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Card Action Buttons */}
+                              <div>
+                                {isPending ? (
+                                  <button
+                                    className="btn btn-primary"
+                                    onClick={() => handleOpenSubmitModal(asg)}
+                                    style={{ width: "100%", padding: "10px", justifyContent: "center", display: "flex", alignItems: "center", gap: "6px" }}
+                                  >
+                                    <span className="material-symbols-outlined">upload_file</span>
+                                    <span>Submit Solution / Lab Code</span>
+                                  </button>
+                                ) : sub ? (
+                                  <button
+                                    className="btn btn-outline"
+                                    onClick={() => setViewingSubmission({ asg, sub })}
+                                    style={{ width: "100%", padding: "9px", justifyContent: "center", display: "flex", alignItems: "center", gap: "6px" }}
+                                  >
+                                    <span className="material-symbols-outlined">visibility</span>
+                                    <span>{status === 'graded' ? "View Graded Solution & Code" : "View Your Submission"}</span>
+                                  </button>
+                                ) : null}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* STUDENT SUBMISSION MODAL */}
+                {submittingAssignment && (
+                  <div className="login-modal-overlay" style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200 }}>
+                    <div style={{
+                      background: "#fff",
+                      width: "95%",
+                      maxWidth: "760px",
+                      maxHeight: "90vh",
+                      borderRadius: "16px",
+                      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden"
+                    }}>
+                      {/* Modal Header */}
+                      <div style={{
+                        padding: "16px 22px",
+                        borderBottom: "1px solid #e2e8f0",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        background: "var(--nith-navy)",
+                        color: "#fff"
+                      }}>
+                        <div>
+                          <div style={{ fontSize: "0.78rem", color: "var(--nith-gold)", fontWeight: 700 }}>
+                            {submittingAssignment.courseCode} • {submittingAssignment.courseName}
+                          </div>
+                          <h3 style={{ margin: "2px 0 0 0", fontSize: "1.1rem", color: "#fff" }}>
+                            Submit Assignment: {submittingAssignment.title}
+                          </h3>
+                        </div>
+                        <button
+                          onClick={() => setSubmittingAssignment(null)}
+                          style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: "50%", width: "32px", height: "32px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {/* Modal Body */}
+                      <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
+                        {submitMessage && (
+                          <div style={{ background: "#dcfce7", color: "#15803d", padding: "12px", borderRadius: "8px", marginBottom: "16px", fontWeight: 700, fontSize: "0.9rem" }}>
+                            {submitMessage}
+                          </div>
+                        )}
+
+                        {/* Task Overview */}
+                        <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "8px", border: "1px solid #e2e8f0", marginBottom: "18px", fontSize: "0.82rem" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
+                            <span><strong>Instructor:</strong> {submittingAssignment.facultyName}</span>
+                            <span><strong>Max Marks:</strong> {submittingAssignment.maxMarks}</span>
+                            <span><strong>Deadline:</strong> {new Date(submittingAssignment.dueDate).toLocaleString()}</span>
+                          </div>
+                          <p style={{ margin: "4px 0 0 0", color: "#475569" }}>
+                            {submittingAssignment.description}
+                          </p>
+                        </div>
+
+                        <form onSubmit={handleStudentSubmit}>
+                          <div className="form-field" style={{ marginBottom: "14px" }}>
+                            <label style={{ display: "block", fontWeight: 600, fontSize: "0.84rem", marginBottom: "6px" }}>
+                              Solution Approach & Written Answer:
+                            </label>
+                            <textarea
+                              rows={3}
+                              placeholder="Explain your approach, design decisions, algorithmic complexity, or written derivation..."
+                              value={submitText}
+                              onChange={(e) => setSubmitText(e.target.value)}
+                              style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1", fontFamily: "inherit" }}
+                            ></textarea>
+                          </div>
+
+                          <div className="form-field" style={{ marginBottom: "14px" }}>
+                            <label style={{ display: "block", fontWeight: 600, fontSize: "0.84rem", marginBottom: "6px" }}>
+                              Source Code Implementation (C++, Python, Java, etc.):
+                            </label>
+                            <textarea
+                              rows={6}
+                              placeholder={`// Paste your complete C++ or Python implementation here...\n#include <iostream>\nusing namespace std;\n\nint main() {\n    // your solution\n    return 0;\n}`}
+                              value={submitCode}
+                              onChange={(e) => setSubmitCode(e.target.value)}
+                              style={{
+                                width: "100%",
+                                padding: "12px",
+                                borderRadius: "8px",
+                                border: "1px solid #cbd5e1",
+                                fontFamily: "var(--font-mono, monospace)",
+                                fontSize: "0.82rem",
+                                background: "#0f172a",
+                                color: "#f8fafc"
+                              }}
+                            ></textarea>
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "16px" }}>
+                            <div className="form-field">
+                              <label style={{ display: "block", fontWeight: 600, fontSize: "0.84rem", marginBottom: "6px" }}>
+                                GitHub Repo / Google Drive URL (Optional):
+                              </label>
+                              <input
+                                type="url"
+                                placeholder="https://github.com/your-username/nith-lab-4"
+                                value={submitAttachmentUrl}
+                                onChange={(e) => setSubmitAttachmentUrl(e.target.value)}
+                                style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #cbd5e1" }}
+                              />
+                            </div>
+
+                            <div className="form-field">
+                              <label style={{ display: "block", fontWeight: 600, fontSize: "0.84rem", marginBottom: "6px" }}>
+                                Upload Lab File / Zip Archive (Optional):
+                              </label>
+                              <label style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                padding: "10px",
+                                border: "1px dashed #94a3b8",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                background: "#f8fafc",
+                                fontSize: "0.82rem",
+                                color: "#475569"
+                              }}>
+                                <input
+                                  type="file"
+                                  style={{ display: "none" }}
+                                  onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                      setSubmitFileName(e.target.files[0].name);
+                                    }
+                                  }}
+                                />
+                                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>upload</span>
+                                <span>{submitFileName || "Choose code/PDF file..."}</span>
+                              </label>
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginTop: "16px" }}>
+                            <button
+                              type="button"
+                              className="btn btn-outline"
+                              onClick={() => setSubmittingAssignment(null)}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              className="btn btn-primary"
+                              style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 20px" }}
+                            >
+                              <span className="material-symbols-outlined">send</span>
+                              <span>Submit to {submittingAssignment.facultyName}</span>
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* SUBMISSION VIEWER MODAL */}
+                {viewingSubmission && (
+                  <div className="login-modal-overlay" style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1200 }}>
+                    <div style={{
+                      background: "#fff",
+                      width: "95%",
+                      maxWidth: "760px",
+                      maxHeight: "90vh",
+                      borderRadius: "16px",
+                      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden"
+                    }}>
+                      {/* Header */}
+                      <div style={{
+                        padding: "16px 22px",
+                        borderBottom: "1px solid #e2e8f0",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        background: "var(--nith-navy)",
+                        color: "#fff"
+                      }}>
+                        <div>
+                          <div style={{ fontSize: "0.78rem", color: "var(--nith-gold)", fontWeight: 700 }}>
+                            {viewingSubmission.asg.courseCode} • {viewingSubmission.asg.courseName}
+                          </div>
+                          <h3 style={{ margin: "2px 0 0 0", fontSize: "1.1rem", color: "#fff" }}>
+                            Your Submission: {viewingSubmission.asg.title}
+                          </h3>
+                        </div>
+                        <button
+                          onClick={() => setViewingSubmission(null)}
+                          style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", borderRadius: "50%", width: "32px", height: "32px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {/* Body */}
+                      <div style={{ padding: "20px 24px", overflowY: "auto", flex: 1 }}>
+                        {/* Grade result if present */}
+                        {viewingSubmission.sub.status === 'graded' && (
+                          <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "10px", padding: "16px", marginBottom: "18px" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                              <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#166534" }}>FACULTY EVALUATION</span>
+                              <span style={{ fontSize: "1.2rem", fontWeight: 800, color: "#15803d" }}>
+                                {viewingSubmission.sub.marksObtained} / {viewingSubmission.asg.maxMarks} Marks
+                              </span>
+                            </div>
+                            <p style={{ margin: "4px 0", fontSize: "0.88rem", color: "#166534", fontStyle: "italic" }}>
+                              "{viewingSubmission.sub.feedback}"
+                            </p>
+                            <div style={{ fontSize: "0.75rem", color: "#475569", marginTop: "8px" }}>
+                              Graded by: {viewingSubmission.sub.gradedBy || viewingSubmission.asg.facultyName} on {viewingSubmission.sub.gradedAt ? new Date(viewingSubmission.sub.gradedAt).toLocaleDateString() : "Recent"}
+                            </div>
+                          </div>
+                        )}
+
+                        <div style={{ marginBottom: "16px" }}>
+                          <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>
+                            SUBMITTED NOTES & APPROACH:
+                          </label>
+                          <p style={{ background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "0.86rem", margin: 0, whiteSpace: "pre-wrap" }}>
+                            {viewingSubmission.sub.submissionText || "No additional text provided."}
+                          </p>
+                        </div>
+
+                        {viewingSubmission.sub.codeSnippet && (
+                          <div style={{ marginBottom: "16px" }}>
+                            <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>
+                              SUBMITTED CODE IMPLEMENTATION:
+                            </label>
+                            <pre style={{
+                              background: "#0f172a",
+                              color: "#f8fafc",
+                              padding: "12px",
+                              borderRadius: "8px",
+                              fontSize: "0.82rem",
+                              overflowX: "auto",
+                              fontFamily: "var(--font-mono, monospace)"
+                            }}>
+                              <code>{viewingSubmission.sub.codeSnippet}</code>
+                            </pre>
+                          </div>
+                        )}
+
+                        {viewingSubmission.sub.attachmentFileName && (
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 14px", background: "#f1f5f9", borderRadius: "6px", fontSize: "0.82rem", marginBottom: "16px" }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>attachment</span>
+                            <span><strong>Attached File:</strong> {viewingSubmission.sub.attachmentFileName}</span>
+                          </div>
+                        )}
+
+                        {viewingSubmission.sub.attachmentUrl && (
+                          <div style={{ marginBottom: "16px" }}>
+                            <a
+                              href={viewingSubmission.sub.attachmentUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: "#2563eb", fontSize: "0.84rem", textDecoration: "underline" }}
+                            >
+                              🔗 View External Project Repo / Drive Link
+                            </a>
+                          </div>
+                        )}
+
+                        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px" }}>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => setViewingSubmission(null)}
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
 
             {/* SUB-TAB 5: GRADES & SGPA */}
             {activeTab === 'grades' && (
