@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NITH-IS | National Institute of Technology Hamirpur</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans, Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Google Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <link rel="stylesheet" href="style.css">
+  <!-- Supabase JavaScript SDK for Cloud Database & Data Storage -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- =====================================================================
+       VIEW 1: HOMEPAGE (ZOMATO-STYLE FULL-WIDTH VIDEO HERO + CARDS JUST BELOW)
+       ===================================================================== -->
+  <div id="view-home" class="page-view active">
+
+    <!-- Top Institutional Header -->
+    <header class="cu-top-header">
+      <div class="header-inner">
+        <div class="institute-identity" onclick="navigateToView('home')" style="cursor:pointer;">
+          <div class="institute-emblem">
+            <span class="material-symbols-outlined">account_balance</span>
+          </div>
+          <div class="institute-titles">
+            <h1>राष्ट्रीय प्रौद्योगिकी संस्थान हमीरपुर</h1>
+            <h2>NATIONAL INSTITUTE OF TECHNOLOGY HAMIRPUR</h2>
+            <span class="portal-badge-text">Informatics System (NITH-IS)</span>
+          </div>
+        </div>
+
+        <div class="header-contact-strip">
+          <div class="contact-pill">
+            <span class="material-symbols-outlined">call</span>
+            <span>Helpdesk: +91 1972 254011</span>
+          </div>
+          <div class="contact-pill">
+            <span class="material-symbols-outlined">mail</span>
+            <span>is.support@nith.ac.in</span>
+          </div>
+          <button class="header-supabase-btn" onclick="openSupabaseModal()" id="btnSupabaseHeader" title="Supabase Database Connection & Storage">
+            <span class="supabase-brand-icon">⚡</span>
+            <span class="supabase-status-dot connected" id="supabaseHeaderDot"></span>
+            <span id="supabaseHeaderLabel">Supabase DB</span>
+          </button>
+          <button class="header-signup-btn" onclick="openSignUpDirect()">
+            <span class="material-symbols-outlined">person_add</span>
+            <span>Sign Up (@nith.ac.in)</span>
+          </button>
+          <button class="header-gemma-btn" onclick="toggleGemmaAiModal()">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            <span>Gemma 4 AI</span>
+          </button>
+          <button class="home-nav-btn" onclick="navigateToView('home')">
+            <span class="material-symbols-outlined">home</span>
+            <span>Portal Home</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CUIMS-Style Live Marquee News Ticker (Strictly on Home Page) -->
+    <div class="cu-ticker-bar">
+      <div class="ticker-label">
+        <span class="material-symbols-outlined">campaign</span>
+        <span>ANNOUNCEMENTS</span>
+      </div>
+      <div class="ticker-content">
+        <div class="ticker-track">
+          <span>🔔 <strong>DoAA:</strong> Mandatory 75% Attendance compliance rule active for Even Semester End-Term Examinations 2026.</span>
+          <span>📢 <strong>Faculty Notice:</strong> All course coordinators requested to update syllabus completion percentage and quiz dates.</span>
+          <span>🎓 <strong>Admissions 2026:</strong> B.Tech & M.Tech seat allotment round 1 result published on applicant portal.</span>
+          <span>🏷️ <strong>Hostels:</strong> Digital QR Gate Pass mandatory for all hostel residents (Kailash & Dhauladhar) after 8:00 PM.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZOMATO-STYLE CINEMATIC CAMPUS VIDEO HERO BANNER -->
+    <section class="zomato-hero-section">
+      <!-- High-definition newly uploaded video playing in the background -->
+      <video id="bgCampusVideo" class="zomato-hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80">
+        <source src="WhatsApp%20Video%202026-10-10%20at%2000.17.07.mp4" type="video/mp4">
+        <source src="campus_bg.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+
+      <!-- Gentle gradient overlay: Video is 100% vibrant & clearly visible, text is crisp -->
+      <div class="zomato-hero-overlay"></div>
+
+      <!-- Center Hero Branding & Zomato Search Bar -->
+      <div class="zomato-hero-content">
+        <div class="zomato-hero-badge">
+          <span class="material-symbols-outlined">account_balance</span>
+          <span>National Institute of Technology Hamirpur (H.P.) • An Institute of National Importance</span>
+        </div>
+
+        <h1 class="zomato-hero-title">NITH-IS</h1>
+
+        <p class="zomato-hero-subtitle">
+          Informatics System • Real-time 75% attendance compliance, digital hostel QR gate passes, faculty syllabus registers & admissions
+        </p>
+
+        <!-- Zomato-Style Search & Gateway Finder -->
+        <div class="zomato-search-wrapper">
+          <div class="zomato-search-bar">
+            <span class="material-symbols-outlined zomato-search-icon">search</span>
+            <input 
+              type="text" 
+              id="zomatoSearchInput" 
+              placeholder="Search roll number, course, 75% attendance, hostel pass, syllabus, faculty..." 
+              onkeyup="handleZomatoSearchKey(event)"
+            />
+            <button class="zomato-search-submit" onclick="executeZomatoSearch()">
+              <span>Find Portal</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+
+          <!-- Quick Access Tag Chips -->
+          <div class="zomato-quick-tags">
+            <span class="quick-tag-label">Quick access:</span>
+            <button class="zomato-tag-chip" onclick="openLoginModal('student')">
+              <span class="material-symbols-outlined">school</span> Student Portal
+            </button>
+            <button class="zomato-tag-chip" onclick="openLoginModal('staff')">
+              <span class="material-symbols-outlined">badge</span> Faculty Portal
+            </button>
+            <button class="zomato-tag-chip" onclick="openLoginModal('admission')">
+              <span class="material-symbols-outlined">how_to_reg</span> Admissions
+            </button>
+            <button class="zomato-tag-chip chip-gemma" onclick="toggleGemmaAiModal()">
+              <span class="material-symbols-outlined">auto_awesome</span> Gemma 4 AI
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Video Control Pills (Bottom Right) -->
+      <div class="zomato-video-controls">
+        <button type="button" class="zomato-ctrl-btn" id="btnToggleVideoPlay" onclick="toggleHeroVideoPlay()" title="Play / Pause">
+          <span class="material-symbols-outlined" id="videoPlayIcon">pause</span>
+          <span class="ctrl-btn-label">Pause</span>
+        </button>
+        <button type="button" class="zomato-ctrl-btn" id="btnToggleVideoMute" onclick="toggleHeroVideoMute()" title="Mute / Sound">
+          <span class="material-symbols-outlined" id="videoMuteIcon">volume_off</span>
+          <span class="ctrl-btn-label">Sound</span>
+        </button>
+        <button type="button" class="zomato-ctrl-btn" onclick="toggleVideoFullscreen()" title="Fullscreen">
+          <span class="material-symbols-outlined">fullscreen</span>
+          <span>Fullscreen</span>
+        </button>
+        <button type="button" class="zomato-ctrl-btn" onclick="promptChangeVideoUrl()" title="Change Video Source">
+          <span class="material-symbols-outlined">video_file</span>
+          <span>Video Source</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- MAIN PORTAL BODY (SHIFTED JUST BELOW THE VIDEO) -->
+    <main class="home-container">
+
+      <!-- SECTION HEADING (ZOMATO STYLE) -->
+      <section class="portal-cards-section">
+        <div class="section-heading">
+          <h2>Select Portal Gateway to Sign In</h2>
+          <p>Choose your institutional role to access academic, administrative, or admission services</p>
+        </div>
+
+        <!-- 3 ZOMATO-STYLE FEATURE CARDS (JUST BELOW VIDEO) -->
+        <div class="three-cards-grid">
+          
+          <!-- CARD 1: Student Login -->
+          <div class="gateway-card student-card" onclick="openLoginModal('student')">
+            <div class="card-banner-img">
+              <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" alt="NIT Hamirpur Student Life" />
+              <span class="card-image-badge">Active Session 2025-26</span>
+            </div>
+            <div class="card-body-content">
+              <div class="card-title-row">
+                <div class="card-icon-bubble">
+                  <span class="material-symbols-outlined">school</span>
+                </div>
+                <h3>Student Login</h3>
+              </div>
+              <p class="card-desc">75% Attendance & Bunk Engine, Timetable, Digital Hostel QR Gate Pass, Fee Receipts & SGPA Grade Cards.</p>
+              <div class="card-footer-cta">
+                <span>Access Student Portal</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2: Staff / Faculty Login -->
+          <div class="gateway-card staff-card" onclick="openLoginModal('staff')">
+            <div class="card-banner-img">
+              <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80" alt="Academic Faculty Lecture Hall" />
+              <span class="card-image-badge staff-badge">Academic Faculty</span>
+            </div>
+            <div class="card-body-content">
+              <div class="card-title-row">
+                <div class="card-icon-bubble">
+                  <span class="material-symbols-outlined">badge</span>
+                </div>
+                <h3>Staff / Faculty Login</h3>
+              </div>
+              <p class="card-desc">Lecture Conduction Logs, Syllabus Completion %, Exam Units, Duty Leave Approvals & Quiz Scheduler.</p>
+              <div class="card-footer-cta">
+                <span>Access Faculty Portal</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3: Admission Login (CUIMS Style) -->
+          <div class="gateway-card admission-card" onclick="openLoginModal('admission')">
+            <div class="card-banner-img">
+              <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80" alt="NIT Hamirpur Campus Entrance" />
+              <span class="card-image-badge admission-badge">JoSAA / CSAB 2026</span>
+            </div>
+            <div class="card-body-content">
+              <div class="card-title-row">
+                <div class="card-icon-bubble">
+                  <span class="material-symbols-outlined">how_to_reg</span>
+                </div>
+                <h3>Admission Login</h3>
+              </div>
+              <p class="card-desc">CUIMS-Style JoSAA/CSAB Applicant Portal: Document Verification, Seat Allotment Letter & Online Reporting.</p>
+              <div class="card-footer-cta">
+                <span>Access Admission Portal</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Official @nith.ac.in Registration Banner Shifted Below -->
+        <div class="signup-callout-card" onclick="openSignUpDirect()">
+          <div class="callout-left">
+            <div class="callout-icon-box">
+              <span class="material-symbols-outlined">mark_email_read</span>
+            </div>
+            <div>
+              <h4>New Student or Staff Registration</h4>
+              <p>Activate your NITH-IS account using your official <strong>@nith.ac.in</strong> Google Workspace ID with OTP verification.</p>
+            </div>
+          </div>
+          <button class="callout-signup-btn">
+            <span>Sign Up with @nith.ac.in</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+
+        <!-- Quick Gemma 4 AI Launcher Banner -->
+        <div class="gemma-promo-strip" onclick="toggleGemmaAiModal()">
+          <div class="gemma-strip-left">
+            <span class="material-symbols-outlined gemma-icon-sparkle">auto_awesome</span>
+            <div>
+              <strong>Powered by Google Gemma 4:</strong>
+              <span>Ask Gemma 4 about Bunk Calculations, Dijkstra Algorithms, Gate Passes, or Exam Notes</span>
+            </div>
+          </div>
+          <div class="gemma-strip-btn">
+            <span>Launch Gemma 4 Copilot</span>
+            <span class="material-symbols-outlined">open_in_new</span>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+    <!-- Institutional Footer -->
+    <footer class="cu-portal-footer">
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="#">Anti-Ragging Undertaking</a>
+          <span>•</span>
+          <a href="#">NIRF 2026 Ranking</a>
+          <span>•</span>
+          <a href="#">National Academic Depository (NAD)</a>
+          <span>•</span>
+          <a href="#">Hostel Directorate</a>
+          <span>•</span>
+          <a href="#">Grievance Redressal Cell</a>
+        </div>
+        <div class="footer-copyright">
+          © 2026 National Institute of Technology Hamirpur (H.P.) - 177005. All Rights Reserved.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- =====================================================================
+       VIEW 2: STUDENT PORTAL (ATTENDANCE & BUNKS, TIMETABLE, GATE PASS)
+       ===================================================================== -->
+  <div id="view-student" class="page-view hidden">
+    <div class="ims-app">
+      <aside class="ims-sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-crest"><span class="material-symbols-outlined">school</span></div>
+          <div class="brand-name">
+            <h1>NITH-IS</h1>
+            <span>Student Portal</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-tab="dashboard">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item" data-tab="attendance">
+            <span class="material-symbols-outlined">fact_check</span>
+            <span>Attendance & Ordinance 7.2</span>
+            <span class="nav-badge alert">72%</span>
+          </button>
+          <button class="nav-item" data-tab="timetable">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span>Timetable & Schedule</span>
+          </button>
+          <button class="nav-item" data-tab="hostel">
+            <span class="material-symbols-outlined">apartment</span>
+            <span>Hostel & Gate Pass</span>
+            <span class="nav-badge success">Active</span>
+          </button>
+          <button class="nav-item" data-tab="grades">
+            <span class="material-symbols-outlined">grade</span>
+            <span>Grades & SGPA</span>
+          </button>
+          <button class="nav-item" data-tab="notices">
+            <span class="material-symbols-outlined">campaign</span>
+            <span>Notices</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebarAvatar">YN</div>
+          <div class="user-meta">
+            <strong id="sidebarStudentName">Yathartha Nagaych</strong>
+            <small id="sidebarStudentMeta">26bce123 • CE (Verified)</small>
+          </div>
+          <button class="logout-icon-btn" onclick="navigateToView('home')" title="Logout to Home">
+            <span class="material-symbols-outlined">logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="ims-main">
+        <header class="ims-header">
+          <div class="header-left">
+            <div class="welcome-heading">
+              <h2 id="studentPageTitle">Student Dashboard</h2>
+              <p>National Institute of Technology Hamirpur (H.P.)</p>
+            </div>
+          </div>
+          <div class="header-right">
+            <!-- Dynamic Branch / Department Switcher -->
+            <div class="dept-quick-badge">
+              <span class="material-symbols-outlined">account_tree</span>
+              <label for="headerDeptSelect">Branch:</label>
+              <select id="headerDeptSelect" onchange="handleDepartmentChange(this.value)">
+                <option value="CE">Civil Engg (CE)</option>
+                <option value="CSE">Computer Science (CSE)</option>
+                <option value="ECE">Electronics (ECE)</option>
+                <option value="EE">Electrical (EE)</option>
+                <option value="ME">Mechanical (ME)</option>
+                <option value="CHE">Chemical (CHE)</option>
+                <option value="MSE">Materials (MSE)</option>
+                <option value="MC">Maths & Comp (M&C)</option>
+                <option value="DCS">Dual Degree CSE (DCS)</option>
+                <option value="DCE">Dual Degree ECE (DCE)</option>
+              </select>
+            </div>
+            <div class="academic-session-pill">
+              <span class="pulse-dot"></span>
+              <span>Session: Jan - Jun 2026</span>
+            </div>
+            <button class="return-home-btn" onclick="navigateToView('home')">
+              <span class="material-symbols-outlined">home</span>
+              <span>Exit to Home</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="content-scrollable">
+          <!-- SUB-TAB: Dashboard -->
+          <section id="tab-dashboard" class="tab-pane active">
+
+            <!-- Official Concept UI Window (Exact match to User Image) -->
+            <div class="concept-dashboard-window" style="margin-bottom: 24px;">
+              <!-- Top macOS blue bar -->
+              <div class="window-top-bar">
+                <div class="mac-dots">
+                  <span class="dot dot-red"></span>
+                  <span class="dot dot-yellow"></span>
+                  <span class="dot dot-green"></span>
+                </div>
+                <h3 class="window-title">Student Dashboard</h3>
+              </div>
+
+              <!-- Window Inner Body -->
+              <div class="concept-window-body">
+                <!-- 3 Pastel Stat Cards -->
+                <div class="concept-summary-grid">
+                  <div class="concept-stat-card card-blue">
+                    <span class="concept-stat-label">ATTENDANCE</span>
+                    <strong class="concept-stat-val" id="conceptOverallPct">91%</strong>
+                  </div>
+                  <div class="concept-stat-card card-cream">
+                    <span class="concept-stat-label">CGPA</span>
+                    <strong class="concept-stat-val">8.7</strong>
+                  </div>
+                  <div class="concept-stat-card card-mint">
+                    <span class="concept-stat-label">NOTICES</span>
+                    <strong class="concept-stat-val">04</strong>
+                  </div>
+                </div>
+
+                <!-- Subject-Wise Attendance Underlined Heading -->
+                <div class="subject-heading-row">
+                  <h4 class="concept-section-title">Subject-Wise Attendance</h4>
+                </div>
+
+                <!-- Vertical Colorful Bar Chart -->
+                <div class="concept-chart-container">
+                  <div class="concept-bars-stage" id="conceptBarsStage">
+                    <div class="concept-bar-col">
+                      <div class="bar-track">
+                        <div class="bar-fill" id="bar-ma101" style="height: 55%; background-color: #2563eb;">
+                          <span class="bar-pct-hover" id="hover-ma101">85%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="concept-bar-col">
+                      <div class="bar-track">
+                        <div class="bar-fill" id="bar-cs102" style="height: 80%; background-color: #06b6d4;">
+                          <span class="bar-pct-hover" id="hover-cs102">95%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="concept-bar-col">
+                      <div class="bar-track">
+                        <div class="bar-fill" id="bar-ep101" style="height: 65%; background-color: #f97316;">
+                          <span class="bar-pct-hover" id="hover-ep101">89%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="concept-bar-col">
+                      <div class="bar-track">
+                        <div class="bar-fill" id="bar-en101" style="height: 95%; background-color: #8b5cf6;">
+                          <span class="bar-pct-hover" id="hover-en101">100%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="concept-bar-col">
+                      <div class="bar-track">
+                        <div class="bar-fill" id="bar-hs101" style="height: 75%; background-color: #10b981;">
+                          <span class="bar-pct-hover" id="hover-hs101">93%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="chart-baseline"></div>
+
+                  <div class="concept-bar-labels-row">
+                    <span class="bar-code-label">MA 101</span>
+                    <span class="bar-code-label">CS 102</span>
+                    <span class="bar-code-label">EP101</span>
+                    <span class="bar-code-label">EN 101</span>
+                    <span class="bar-code-label">HS 101</span>
+                  </div>
+                </div>
+
+                <p class="concept-footer-note">Concept UI = Sample values for demonstration</p>
+              </div>
+            </div>
+
+            <div class="stats-cards-grid">
+              <div class="stat-card">
+                <div class="stat-icon-wrapper green-glow"><span class="material-symbols-outlined">verified</span></div>
+                <div class="stat-details">
+                  <span class="stat-label">Overall Attendance</span>
+                  <div class="stat-value-row">
+                    <span class="stat-value" id="kpiOverallPct">81.4%</span>
+                    <span class="stat-pill success" id="kpiOverallPill">Safe (&gt;75%)</span>
+                  </div>
+                  <small class="stat-subtext" id="kpiOverallSub">136 of 167 Lectures Attended</small>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon-wrapper blue-glow"><span class="material-symbols-outlined">stars</span></div>
+                <div class="stat-details">
+                  <span class="stat-label">Cumulative CGPA</span>
+                  <div class="stat-value-row">
+                    <span class="stat-value">8.74</span>
+                    <span class="stat-pill accent">Dean's List</span>
+                  </div>
+                  <small class="stat-subtext" id="kpiRankSub">Rank: Top 8% in Branch</small>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon-wrapper amber-glow"><span class="material-symbols-outlined">warning</span></div>
+                <div class="stat-details">
+                  <span class="stat-label">Attendance Warning</span>
+                  <div class="stat-value-row">
+                    <span class="stat-value" id="kpiWarningCount">1 Subject</span>
+                    <span class="stat-pill warning" id="kpiWarningPill">Needs +2 classes</span>
+                  </div>
+                  <small class="stat-subtext" id="kpiWarningSub">Deficient subjects list</small>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon-wrapper purple-glow"><span class="material-symbols-outlined">bed</span></div>
+                <div class="stat-details">
+                  <span class="stat-label">Hostel Residency</span>
+                  <div class="stat-value-row">
+                    <span class="stat-value">Kailash (KBH)</span>
+                    <span class="stat-pill neutral">Room 314</span>
+                  </div>
+                  <small class="stat-subtext">Mess Active • Digital Gate Pass Ready</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mid Row: Upcoming Class Card & Attendance Health with Direct Input -->
+            <div class="dashboard-mid-grid">
+              <div class="card current-class-card">
+                <div class="card-head">
+                  <div class="head-title">
+                    <span class="material-symbols-outlined">schedule</span>
+                    <h3>Upcoming Lecture Today</h3>
+                  </div>
+                  <span class="status-live" id="upcomingInMins">In 20 mins</span>
+                </div>
+                <div class="class-hero-box">
+                  <div class="class-time-tag" id="upcomingTime">10:00 AM - 11:00 AM</div>
+                  <h4 class="class-subject" id="upcomingSubject">CE-304: Environmental Engineering</h4>
+                  <div class="class-room-badge">
+                    <span class="material-symbols-outlined">meeting_room</span>
+                    <span id="upcomingRoom">LH-108 (Lecture Hall Complex)</span>
+                  </div>
+                  <p class="faculty-name" id="upcomingFaculty">Dr. Hemant Kumar • Dept. of Civil Engineering</p>
+                  <div class="class-action-row">
+                    <button class="btn btn-outline" onclick="switchStudentTab('timetable')">View Full Day Timetable</button>
+                    <button class="btn btn-primary" onclick="switchStudentTab('attendance')">Check Subject Attendance</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card watchlist-card">
+                <div class="card-head">
+                  <div class="head-title">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <h3>75% Attendance Health</h3>
+                  </div>
+                  <div class="card-head-actions">
+                    <button class="btn-put-att-pill" onclick="openAttendanceModal()">
+                      <span class="material-symbols-outlined">edit_calendar</span>
+                      <span>Put Attendance</span>
+                    </button>
+                    <button class="link-btn" onclick="switchStudentTab('attendance')">Full Calc &rarr;</button>
+                  </div>
+                </div>
+                <div class="watchlist-items" id="dashboardWatchlist"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SUB-TAB: Attendance -->
+                    <!-- SUB-TAB: Attendance -->
+          <section id="tab-attendance" class="tab-pane">
+            <div class="simulator-hero-banner" style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">
+              <div class="banner-text">
+                <h3>🎯 Official Academic Attendance Register (Ordinance 7.2)</h3>
+                <p>Attendance is recorded directly by faculty during daily lecture sessions and cannot be manually modified by students.</p>
+              </div>
+              <div class="simulator-quick-stat">
+                <span class="sim-number" id="officialAttPct">91%</span>
+                <span class="sim-label">Overall Attendance</span>
+              </div>
+            </div>
+
+            <div class="attendance-toolbar-row">
+              <div class="toolbar-left">
+                <span style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #15803d; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 8px 16px; borderRadius: 8px; font-size: 0.88rem;">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">verified</span>
+                  Official Faculty-Verified Registry (Read-Only)
+                </span>
+              </div>
+              <div class="toolbar-hint">
+                <span class="material-symbols-outlined">lock</span>
+                <span>Directly linked to Teacher Lecture Sessions under Ordinance 7.2</span>
+              </div>
+            </div>
+
+            <div class="subjects-attendance-grid" id="subjectsGrid"></div>
+          </section>
+
+          <!-- SUB-TAB: Timetable -->
+          <section id="tab-timetable" class="tab-pane">
+            <div class="timetable-controls-bar">
+              <!-- Department / Branch Switcher -->
+              <div class="dept-selector-wrap">
+                <span class="material-symbols-outlined">account_tree</span>
+                <label for="deptSelect">Department:</label>
+                <select id="deptSelect" class="dept-select-dropdown" onchange="handleDepartmentChange(this.value)">
+                  <option value="CE">Civil Engineering (CE)</option>
+                  <option value="CSE">Computer Science & Engineering (CSE)</option>
+                  <option value="ECE">Electronics & Communication (ECE)</option>
+                  <option value="EE">Electrical Engineering (EE)</option>
+                  <option value="ME">Mechanical Engineering (ME)</option>
+                  <option value="CHE">Chemical Engineering (CHE)</option>
+                  <option value="MSE">Materials Science & Engineering (MSE)</option>
+                  <option value="MC">Mathematics & Computing (M&C)</option>
+                </select>
+              </div>
+              <div class="day-switcher" id="daySwitcher">
+                <button class="day-btn" data-day="Mon">Monday</button>
+                <button class="day-btn" data-day="Tue">Tuesday</button>
+                <button class="day-btn active" data-day="Wed">Wednesday (Today)</button>
+                <button class="day-btn" data-day="Thu">Thursday</button>
+                <button class="day-btn" data-day="Fri">Friday</button>
+              </div>
+              <div class="batch-tag" id="timetableBatchTag">B.Tech CE - Section A • LH-108</div>
+            </div>
+            <div class="timetable-timeline" id="timetableTimeline"></div>
+          </section>
+
+          <!-- SUB-TAB: Hostel & Gate Pass -->
+          <section id="tab-hostel" class="tab-pane">
+            <div class="hostel-split-grid">
+              <div class="card gate-pass-form-card">
+                <div class="card-head">
+                  <div class="head-title">
+                    <span class="material-symbols-outlined">qr_code_2</span>
+                    <h3>Generate Digital Outing Gate Pass</h3>
+                  </div>
+                  <span class="gate-status-pill">Kailash Hostel</span>
+                </div>
+                <form id="gatePassForm" class="pass-form">
+                  <div class="form-group">
+                    <label>Student Name & Roll No</label>
+                    <input type="text" value="Aarav Sharma (22BCSE042)" readonly class="readonly-input">
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="passType">Pass Category</label>
+                      <select id="passType">
+                        <option value="City Outing (Hamirpur Market)">City Outing (Hamirpur Market)</option>
+                        <option value="Home Leave">Home Leave (Weekend)</option>
+                        <option value="Medical / Health Centre">Medical / Health Centre</option>
+                        <option value="Academic Project Work">Academic / Project Work</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="returnTime">Expected Return Time</label>
+                      <input type="time" id="returnTime" value="20:30">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="destination">Destination / Purpose</label>
+                    <input type="text" id="destination" placeholder="e.g. Gandhi Chowk Market for books" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">Generate Approved QR Pass</button>
+                </form>
+              </div>
+
+              <div class="card active-pass-preview-card" id="activePassCard">
+                <div class="pass-ticket-header">
+                  <div class="pass-brand">
+                    <span class="material-symbols-outlined">security</span>
+                    <strong>NITH SECURITY PASS</strong>
+                  </div>
+                  <span class="pass-valid-chip">LIVE & VALID</span>
+                </div>
+                <div class="qr-center-box">
+                  <div class="qr-canvas-mock">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=NITH-PASS-22BCSE042-VERIFIED" alt="Pass QR">
+                  </div>
+                  <span class="qr-caption">Scan at Main Gate / Hostel Warden Post</span>
+                </div>
+                <div class="pass-details-table">
+                  <div class="detail-row"><span>Student:</span><strong>Aarav Sharma</strong></div>
+                  <div class="detail-row"><span>Hostel:</span><strong>Kailash Hostel • Rm 314</strong></div>
+                  <div class="detail-row"><span>Category:</span><strong id="displayPassType">City Outing</strong></div>
+                  <div class="detail-row"><span>Valid Until:</span><strong id="displayPassTime" class="highlight-time">Today, 08:30 PM</strong></div>
+                </div>
+                <div class="pass-footer-watermark">DoSW Verified • National Institute of Technology Hamirpur</div>
+              </div>
+            </div>
+
+            <!-- Mess Schedule -->
+            <div class="card full-width-card" style="margin-top:20px;">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined">restaurant</span>
+                  <h3>Today's Hostel Mess Menu (Kailash & Dhauladhar)</h3>
+                </div>
+                <span class="gate-status-pill">Wednesday Special</span>
+              </div>
+              <div class="mess-meals-grid">
+                <div class="meal-card">
+                  <span class="meal-badge">Breakfast (7:30 - 9:00 AM)</span>
+                  <h5>Aloo Pyaz Paratha & Curd</h5>
+                  <p>Boiled Eggs / Butter / Bread, Hot Tea & Coffee</p>
+                </div>
+                <div class="meal-card active-meal">
+                  <span class="meal-badge current">Lunch (12:30 - 2:00 PM)</span>
+                  <h5>Rajma Madra & Steamed Rice</h5>
+                  <p>Seasonal Veg, Chapati, Boondi Raita, Green Salad</p>
+                </div>
+                <div class="meal-card">
+                  <span class="meal-badge">Evening Snacks (5:00 - 6:00 PM)</span>
+                  <h5>Vegetable Cutlet & Chai</h5>
+                  <p>Mint Chutney, Biscuits</p>
+                </div>
+                <div class="meal-card">
+                  <span class="meal-badge">Dinner (7:30 - 9:30 PM)</span>
+                  <h5>Paneer Butter Masala & Dal Makhani</h5>
+                  <p>Jeera Rice, Butter Roti, Hot Gulab Jamun (1 pc)</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SUB-TAB: Grades -->
+          <section id="tab-grades" class="tab-pane">
+            <div class="grades-overview-banner">
+              <div class="cgpa-ring-container">
+                <div class="cgpa-big-number">8.74</div>
+                <div class="cgpa-ring-sub">Cumulative CGPA</div>
+              </div>
+              <div class="credits-stat-list">
+                <div class="credit-item"><span class="c-val">118</span><span class="c-lbl">Credits Earned</span></div>
+                <div class="credit-item"><span class="c-val">0</span><span class="c-lbl">Active Backlogs</span></div>
+                <div class="credit-item"><span class="c-val">9.12</span><span class="c-lbl">5th Sem SGPA</span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SUB-TAB: Notices -->
+          <section id="tab-notices" class="tab-pane">
+            <div class="notices-full-feed" id="noticesFeed"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       VIEW 3: STAFF / FACULTY PORTAL (REQUESTED SPECIFICS!)
+       1. Mark Class Conducted Today
+       2. Syllabus Completion Percentage Tracker
+       3. Units Coming in Next Exams
+       4. Quiz Schedule & Dates
+       ===================================================================== -->
+  <div id="view-staff" class="page-view hidden">
+    <div class="ims-app">
+      <aside class="ims-sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-crest" style="background:var(--nith-crimson);"><span class="material-symbols-outlined">badge</span></div>
+          <div class="brand-name">
+            <h1>NITH-IS</h1>
+            <span>Faculty Portal</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-stafftab="classes">
+            <span class="material-symbols-outlined">how_to_reg</span>
+            <span>Mark Lecture Attendance</span>
+          </button>
+          <button class="nav-item" data-stafftab="schedule">
+            <span class="material-symbols-outlined">document_scanner</span>
+            <span>Courses & Gemma 4 AI Schedule</span>
+          </button>
+          <button class="nav-item" data-stafftab="syllabus">
+            <span class="material-symbols-outlined">checklist</span>
+            <span>Syllabus Tracker</span>
+          </button>
+          <button class="nav-item" data-stafftab="exams">
+            <span class="material-symbols-outlined">assignment</span>
+            <span>Exam Units & Coverage</span>
+          </button>
+          <button class="nav-item" data-stafftab="quizzes">
+            <span class="material-symbols-outlined">quiz</span>
+            <span>Quiz Scheduler</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-user">
+          <div class="user-avatar" style="background:var(--nith-navy);">RS</div>
+          <div class="user-meta">
+            <strong>Prof. R. K. Sharma</strong>
+            <small>HOD • Dept. of CSE</small>
+          </div>
+          <button class="logout-icon-btn" onclick="navigateToView('home')" title="Logout to Home">
+            <span class="material-symbols-outlined">logout</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="ims-main">
+        <header class="ims-header">
+          <div class="header-left">
+            <div class="welcome-heading">
+              <h2 id="staffPageTitle">Faculty Academic Console</h2>
+              <p>Department of Computer Science & Engineering • NIT Hamirpur</p>
+            </div>
+          </div>
+          <div class="header-right">
+            <div class="academic-session-pill">
+              <span class="pulse-dot"></span>
+              <span>Logged in as: Prof. R. K. Sharma (Emp ID: 108)</span>
+            </div>
+            <button class="return-home-btn" onclick="navigateToView('home')">
+              <span class="material-symbols-outlined">home</span>
+              <span>Exit to Home</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="content-scrollable">
+          
+          <!-- FEATURE 1: Mark Class Conducted Today -->
+                    <!-- FEATURE 1: Mark Lecture Attendance Today -->
+          <section id="stafftab-classes" class="tab-pane active">
+            <div class="card">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined">how_to_reg</span>
+                  <h3>Take Daily Lecture & Mark Student Attendance</h3>
+                </div>
+                <span class="gate-status-pill" style="background:#eff6ff;color:#1d4ed8;">Direct Student Portal Sync Active</span>
+              </div>
+
+              <p style="margin: 10px 0 20px 0; font-size: 0.86rem; color: #64748b;">
+                Select the course conducted, specify date & lecture topic, then mark students Present or Absent. Marks sync directly into students' verified dashboards.
+              </p>
+
+              <!-- Course & Lecture Setup Form -->
+              <div style="background: #f8fafc; padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div>
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px;">Course Offered</label>
+                  <select id="staffCourseSelect" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem; font-weight: 600; background: #fff;">
+                    <option value="CS 102">CS 102 - Computer Programming</option>
+                    <option value="MA 101">MA 101 - Engineering Mathematics-I</option>
+                    <option value="EP101">EP101 - Engineering Physics</option>
+                    <option value="EN 101">EN 101 - Environmental Science</option>
+                    <option value="HS 101">HS 101 - Professional Communication</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px;">Lecture Date</label>
+                  <input type="date" id="staffLectureDate" value="2026-10-10" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem; background: #fff;">
+                </div>
+
+                <div>
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px;">Venue / Hall</label>
+                  <input type="text" id="staffLectureRoom" value="LH-104" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem; background: #fff;">
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                  <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 6px;">Topic Covered Today</label>
+                  <input type="text" id="staffLectureTopic" value="Process Synchronization & Semaphores" placeholder="Enter topic taught" style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.9rem; background: #fff;">
+                </div>
+              </div>
+
+              <!-- Student Roster Quick Header -->
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                <div>
+                  <h4 style="margin: 0; font-size: 1.05rem; color: #0f172a;">Enrolled Student Roster</h4>
+                  <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #64748b;" id="rosterTallySub">Currently Marked: 7 Present • 1 Absent (88%)</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                  <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 6px 14px;" onclick="markStaticRosterAll(true)">
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: #16a34a;">done_all</span> Mark All Present
+                  </button>
+                  <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 6px 14px;" onclick="markStaticRosterAll(false)">
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: #dc2626;">remove_done</span> Mark All Absent
+                  </button>
+                </div>
+              </div>
+
+              <!-- Roster Cards Container -->
+              <div id="staticRosterGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 24px;"></div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <button type="button" class="btn btn-primary" onclick="saveStaticLectureAttendance()" style="padding: 12px 28px; font-size: 0.95rem;">
+                  <span class="material-symbols-outlined">save</span>
+                  Save & Sync Lecture Attendance to Students
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- FEATURE 2: Courses & Gemma 4 AI Schedule Photo Scanner -->
+          <section id="stafftab-schedule" class="tab-pane">
+            <div class="card" style="margin-bottom: 24px;">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined" style="color: #7c3aed;">document_scanner</span>
+                  <h3>Gemma 4 Multimodal AI Timetable Photo Scanner</h3>
+                </div>
+                <span class="gate-status-pill" style="background: #f5f3ff; color: #6d28d9;">Gemma 4 (9B Vision) Enabled</span>
+              </div>
+
+              <p style="margin: 10px 0 18px 0; font-size: 0.86rem; color: #64748b;">
+                Simply upload a photo of your schedule sheet. Gemma 4 Vision OCR detects course slots, timings, and lecture rooms, automatically structuring your teaching schedule in the system.
+              </p>
+
+              <div style="border: 2px dashed #cbd5e1; border-radius: 14px; padding: 24px; text-align: center; background: #f8fafc;">
+                <div id="gemmaPhotoPreviewBox" style="display: none; margin-bottom: 16px;">
+                  <img id="gemmaPhotoImg" src="" alt="Schedule Preview" style="max-height: 220px; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.1); margin: 0 auto; display: block;">
+                  <p id="gemmaPhotoFileName" style="margin-top: 10px; font-size: 0.84rem; color: #475569;"></p>
+                </div>
+                <div id="gemmaUploadPlaceholder" style="padding: 20px;">
+                  <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">add_photo_alternate</span>
+                  <h4 style="margin: 8px 0 4px 0; color: #1e293b;">Upload Timetable Photo</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #64748b;">PNG, JPG, or WEBP photo of official NIT Hamirpur schedule</p>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 12px;">
+                  <label class="btn btn-outline" style="cursor: pointer;">
+                    <span class="material-symbols-outlined">upload_file</span>
+                    <span>Choose Photo from Device</span>
+                    <input type="file" id="staticScheduleFileInput" accept="image/*" style="display: none;" onchange="handleStaticPhotoSelect(this)">
+                  </label>
+                  <button type="button" class="btn btn-outline" onclick="useStaticSamplePhoto()">
+                    <span class="material-symbols-outlined">sample_rates</span>
+                    <span>Use Sample Schedule Sheet</span>
+                  </button>
+                  <button type="button" class="btn btn-primary" id="btnScanStaticGemma" onclick="triggerStaticGemmaScan()" style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); border-color: #7c3aed;">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    <span>Scan Schedule with Gemma 4</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Gemma 4 Extraction Results -->
+              <div id="gemmaExtractionResult" style="display: none; margin-top: 20px; background: #faf5ff; border: 1.5px solid #d8b4fe; border-radius: 14px; padding: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined" style="color: #7c3aed;">psychology</span>
+                    <strong style="color: #581c87; font-size: 0.96rem;">Gemma 4 Multimodal Vision Extraction Complete</strong>
+                  </div>
+                  <span style="font-size: 0.78rem; background: #f3e8ff; color: #6b21a8; padding: 4px 10px; border-radius: 12px; font-weight: 700;">Gemma 4 (9B Vision)</span>
+                </div>
+                <p id="gemmaResultMsg" style="font-size: 0.85rem; color: #6b21a8; margin: 0 0 14px 0;"></p>
+                <div id="gemmaCoursesCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px;"></div>
+                <div style="display: flex; justify-content: flex-end;">
+                  <button type="button" class="btn btn-primary" onclick="applyStaticGemmaSchedule()" style="background: #7c3aed; border-color: #7c3aed;">
+                    <span class="material-symbols-outlined">task_alt</span>
+                    <span>Apply & Save to My System Schedule</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Offered Courses Card -->
+            <div class="card">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined">menu_book</span>
+                  <h3>My Offered Courses & Timetable Slots</h3>
+                </div>
+              </div>
+              <div id="offeredCoursesList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 16px;"></div>
+            </div>
+          </section>
+
+          <!-- FEATURE 2: Syllabus Completion Tracker -->
+          <section id="stafftab-syllabus" class="tab-pane">
+            <div class="card">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined">data_usage</span>
+                  <h3>Syllabus Completion Monitoring (CS-302: Operating Systems)</h3>
+                </div>
+                <div class="overall-progress-chip" id="overallSyllabusText">Overall Completed: 72%</div>
+              </div>
+
+              <div class="syllabus-units-container">
+                <!-- Unit 1 -->
+                <div class="unit-progress-row">
+                  <div class="unit-header-info">
+                    <strong>Unit 1: Introduction to OS, Dual Mode & System Calls</strong>
+                    <span class="unit-pct" id="u1-pct">100% Completed</span>
+                  </div>
+                  <input type="range" min="0" max="100" value="100" class="syllabus-slider" oninput="updateUnitProgress(1, this.value)">
+                </div>
+
+                <!-- Unit 2 -->
+                <div class="unit-progress-row">
+                  <div class="unit-header-info">
+                    <strong>Unit 2: Process Scheduling, Threads & Inter-Process Comm</strong>
+                    <span class="unit-pct" id="u2-pct">100% Completed</span>
+                  </div>
+                  <input type="range" min="0" max="100" value="100" class="syllabus-slider" oninput="updateUnitProgress(2, this.value)">
+                </div>
+
+                <!-- Unit 3 -->
+                <div class="unit-progress-row">
+                  <div class="unit-header-info">
+                    <strong>Unit 3: Synchronization, Semaphores & Deadlocks (Active)</strong>
+                    <span class="unit-pct" id="u3-pct">60% Completed</span>
+                  </div>
+                  <input type="range" min="0" max="100" value="60" class="syllabus-slider" oninput="updateUnitProgress(3, this.value)">
+                </div>
+
+                <!-- Unit 4 -->
+                <div class="unit-progress-row">
+                  <div class="unit-header-info">
+                    <strong>Unit 4: Memory Management, Paging & Virtual Memory</strong>
+                    <span class="unit-pct" id="u4-pct">0% Completed</span>
+                  </div>
+                  <input type="range" min="0" max="100" value="0" class="syllabus-slider" oninput="updateUnitProgress(4, this.value)">
+                </div>
+
+                <!-- Unit 5 -->
+                <div class="unit-progress-row">
+                  <div class="unit-header-info">
+                    <strong>Unit 5: File Systems, Disk Scheduling & I/O Protection</strong>
+                    <span class="unit-pct" id="u5-pct">0% Completed</span>
+                  </div>
+                  <input type="range" min="0" max="100" value="0" class="syllabus-slider" oninput="updateUnitProgress(5, this.value)">
+                </div>
+              </div>
+
+              <button class="btn btn-primary" style="margin-top:20px;" onclick="saveSyllabusChanges()">
+                <span class="material-symbols-outlined">save</span>
+                <span>Publish Updated Syllabus Status to Students</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- FEATURE 3: Exam Units & Syllabus Announcement -->
+          <section id="stafftab-exams" class="tab-pane">
+            <div class="card">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined">menu_book</span>
+                  <h3>Specify Units Coming in Next Exams</h3>
+                </div>
+              </div>
+
+              <div class="exam-units-grid">
+                <div class="exam-spec-card">
+                  <div class="exam-spec-badge">Upcoming Assessment</div>
+                  <h4>Mid-Term Examination (MSE 2026)</h4>
+                  <p>Weightage: 30 Marks • Duration: 2 Hours</p>
+                  <div class="included-units-picker">
+                    <label><input type="checkbox" checked> Unit 1: Introduction & System Calls</label>
+                    <label><input type="checkbox" checked> Unit 2: Process Scheduling & Threads</label>
+                    <label><input type="checkbox" checked> Unit 3: Classical Synchronization & Deadlocks</label>
+                    <label><input type="checkbox"> Unit 4: Virtual Memory & Page Replacement</label>
+                  </div>
+                  <div class="faculty-note-input">
+                    <label>Instructor Notice to Students:</label>
+                    <input type="text" value="Numerical questions on Peterson's Solution and Banker's Algorithm mandatory.">
+                  </div>
+                  <button class="btn btn-primary" onclick="alert('Mid-Term Exam Syllabus Notified to Students!')">Notify Students</button>
+                </div>
+
+                <div class="exam-spec-card">
+                  <div class="exam-spec-badge" style="background:#fee2e2; color:var(--nith-crimson);">Final Exam</div>
+                  <h4>End-Term Examination (ESE 2026)</h4>
+                  <p>Weightage: 50 Marks • Duration: 3 Hours</p>
+                  <div class="included-units-picker">
+                    <label><input type="checkbox" checked> Full Syllabus: Unit 1 to Unit 5</label>
+                    <label><input type="checkbox" checked> Unit 4 (Paging) & Unit 5 (Disk SSTF/SCAN) have 40% weightage</label>
+                  </div>
+                  <div class="faculty-note-input">
+                    <label>Instructor Notice to Students:</label>
+                    <input type="text" value="Formula sheet for disk scheduling algorithms will be provided.">
+                  </div>
+                  <button class="btn btn-primary" onclick="alert('End-Term Syllabus Guidelines Published!')">Notify Students</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- FEATURE 4: Quiz Scheduler -->
+          <section id="stafftab-quizzes" class="tab-pane">
+            <div class="card">
+              <div class="card-head">
+                <div class="head-title">
+                  <span class="material-symbols-outlined">event_note</span>
+                  <h3>Scheduled Quizzes & Surprise Assessments</h3>
+                </div>
+                <button class="btn btn-primary" onclick="scheduleNewQuizPrompt()">+ Schedule New Quiz</button>
+              </div>
+
+              <div class="quiz-table-container">
+                <table class="quiz-table" id="quizTable">
+                  <thead>
+                    <tr>
+                      <th>Quiz Name</th>
+                      <th>Course</th>
+                      <th>Scheduled Date</th>
+                      <th>Time & Venue</th>
+                      <th>Syllabus Topics Covered</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Quiz 1 (Surprise Quiz)</strong></td>
+                      <td>CS-302 (OS)</td>
+                      <td><span class="quiz-date-pill">Wednesday, 14 Oct 2026</span></td>
+                      <td>10:00 AM • LH-104</td>
+                      <td>Unit 1 & Unit 2 (Process Scheduling)</td>
+                      <td><span class="status-live">Confirmed</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Quiz 2 (Coding & Theory)</strong></td>
+                      <td>CS-302 (OS)</td>
+                      <td><span class="quiz-date-pill">Monday, 26 Oct 2026</span></td>
+                      <td>10:00 AM • LH-104</td>
+                      <td>Semaphore Implementation & Deadlocks</td>
+                      <td><span class="status-live">Confirmed</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Lab Evaluation Quiz</strong></td>
+                      <td>CS-305 (Microprocessors)</td>
+                      <td><span class="quiz-date-pill">Friday, 30 Oct 2026</span></td>
+                      <td>02:00 PM • CC Hardware Lab</td>
+                      <td>8086 Assembly Language Programming</td>
+                      <td><span class="status-live">Confirmed</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       VIEW 4: ADMISSION PORTAL (CUIMS STYLE APPLICANT GATEWAY)
+       ===================================================================== -->
+  <div id="view-admission" class="page-view hidden">
+    <div class="cuims-admission-layout">
+      
+      <!-- Top Admission Subheader -->
+      <div class="admission-banner">
+        <div class="adm-banner-content">
+          <span class="adm-pill">B.Tech & M.Tech Admissions 2026-27</span>
+          <h2>Candidate Admission & Counselling Portal</h2>
+          <p>National Institute of Technology Hamirpur • JoSAA & CSAB Reporting Gateway</p>
+        </div>
+        <button class="return-home-btn" onclick="navigateToView('home')">
+          <span class="material-symbols-outlined">home</span>
+          <span>Exit to Portal Home</span>
+        </button>
+      </div>
+
+      <!-- Applicant Status & Services Dashboard (Directly modeled after CUIMS) -->
+      <div class="adm-body-grid">
+        
+        <!-- Left: Applicant File & Verification Status -->
+        <div class="card adm-status-card">
+          <div class="card-head">
+            <div class="head-title">
+              <span class="material-symbols-outlined">person_pin</span>
+              <h3>Applicant File: Rohini Verma</h3>
+            </div>
+            <span class="gate-status-pill">JEE Main 2026</span>
+          </div>
+
+          <div class="candidate-spec-table">
+            <div class="c-row"><span>Application Form ID:</span><strong>NITH-UG-2026-4891</strong></div>
+            <div class="c-row"><span>JEE Main CRL Rank:</span><strong>14,210</strong></div>
+            <div class="c-row"><span>Allotted Programme:</span><strong style="color:var(--nith-navy);">B.Tech in Computer Science & Engineering</strong></div>
+            <div class="c-row"><span>Counselling Allocation Round:</span><strong>JoSAA Round 1 (Provisional)</strong></div>
+            <div class="c-row"><span>Hostel Accommodation:</span><strong>Ambika Girls Hostel (Allotted)</strong></div>
+          </div>
+
+          <!-- Stepper Verification Tracker -->
+          <div class="counselling-stepper">
+            <div class="step-item completed">
+              <div class="step-circle"><span class="material-symbols-outlined">done</span></div>
+              <div class="step-text">
+                <strong>1. Registration & Choice Locking</strong>
+                <small>Completed on 15 June 2026</small>
+              </div>
+            </div>
+
+            <div class="step-item completed">
+              <div class="step-circle"><span class="material-symbols-outlined">done</span></div>
+              <div class="step-text">
+                <strong>2. Seat Allotment (Round 1: CSE)</strong>
+                <small>Allotted at NIT Hamirpur</small>
+              </div>
+            </div>
+
+            <div class="step-item in-progress">
+              <div class="step-circle">3</div>
+              <div class="step-text">
+                <strong>3. Document Verification</strong>
+                <small>Class 10/12 Marksheets & Medical Certificate Under Review</small>
+              </div>
+            </div>
+
+            <div class="step-item pending">
+              <div class="step-circle">4</div>
+              <div class="step-text">
+                <strong>4. Seat Acceptance Fee & Reporting</strong>
+                <small>Pay balance semester fee to confirm admission</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="adm-action-row">
+            <button class="btn btn-primary" onclick="alert('Downloading Provisional Seat Allotment Letter (PDF)...')">
+              <span class="material-symbols-outlined">download</span>
+              <span>Download Allotment Letter</span>
+            </button>
+            <button class="btn btn-outline" onclick="alert('Opening Document Upload Portal...')">
+              <span class="material-symbols-outlined">upload_file</span>
+              <span>Re-upload Documents</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Fee Payment & Important Dates -->
+        <div class="adm-sidebar-column">
+          <div class="card">
+            <div class="card-head">
+              <div class="head-title">
+                <span class="material-symbols-outlined">payments</span>
+                <h3>Admission Fee Breakdown</h3>
+              </div>
+            </div>
+            <div class="fee-receipt-box">
+              <div class="fee-row"><span>Tuition Fee (Sem 1):</span><strong>₹ 62,500</strong></div>
+              <div class="fee-row"><span>Institute Caution Deposit:</span><strong>₹ 5,000</strong></div>
+              <div class="fee-row"><span>Hostel & Mess Advance:</span><strong>₹ 28,000</strong></div>
+              <div class="fee-row total-fee"><span>Total Payable:</span><strong>₹ 95,500</strong></div>
+              <button class="btn btn-primary btn-block" style="margin-top:14px;" onclick="alert('Redirecting to SBI Collect / HDFC Payment Gateway for NIT Hamirpur Fee Payment...')">
+                <span>Pay Admission Fee Online</span>
+                <span class="material-symbols-outlined">lock</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:18px;">
+            <div class="card-head">
+              <div class="head-title">
+                <span class="material-symbols-outlined">schedule</span>
+                <h3>Key Admission Deadlines</h3>
+              </div>
+            </div>
+            <ul class="adm-dates-list">
+              <li><strong>15 Oct 2026:</strong> Physical Reporting at NIT Hamirpur Auditorium</li>
+              <li><strong>18 Oct 2026:</strong> Hostel Room Allotment (Kailash & Ambika)</li>
+              <li><strong>21 Oct 2026:</strong> Orientation Programme & Commencement of Classes</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       POPUP AUTH MODAL (SIGN IN & SIGN UP WITH @nith.ac.in OTP VERIFICATION)
+       ===================================================================== -->
+  <div id="loginModal" class="login-modal-overlay hidden">
+    <div class="cuims-modal-backdrop" onclick="closeLoginModal()"></div>
+    <div class="cuims-gateway-card">
+      <!-- Floating Close Button -->
+      <button class="cuims-close-floating-btn" onclick="closeLoginModal()" title="Close Gateway">&times;</button>
+
+      <!-- ========================================================= -->
+      <!-- LEFT PANEL: CUIMS INSTITUTIONAL SHOWCASE & CAMPUS LIFE    -->
+      <!-- ========================================================= -->
+      <div class="cuims-left-showcase">
+        <div class="cuims-showcase-bg-overlay"></div>
+
+        <div class="cuims-showcase-top">
+          <!-- Top Institutional Crest & Bilingual Branding -->
+          <div class="cuims-inst-header">
+            <div class="cuims-crest-bubble">
+              <span class="material-symbols-outlined">account_balance</span>
+            </div>
+            <div class="cuims-inst-text">
+              <div class="cuims-hindi-title">राष्ट्रीय प्रौद्योगिकी संस्थान हमीरपुर</div>
+              <h4>NIT HAMIRPUR</h4>
+              <p>UIMS • INFORMATICS SYSTEM (NITH-IS)</p>
+            </div>
+          </div>
+
+          <!-- Accreditation & Campus Status Pill -->
+          <div class="cuims-accreditation-strip">
+            <span class="cuims-badge-red">NAAC 'A+' GRADE</span>
+            <span class="cuims-badge-gold">NIRF RANKED</span>
+            <span class="cuims-badge-blue">MHRD / INI</span>
+          </div>
+
+          <!-- Portal Headline -->
+          <div class="cuims-showcase-headline">
+            <h2>Student Gateway Portal</h2>
+            <p>Unified Information Management System for Ordinance 7.2 compliance, VLHC lecture hall timetable & biometric hostel gate pass.</p>
+          </div>
+
+          <!-- CUIMS Feature Showcase Cards -->
+          <div class="cuims-features-list">
+            <div class="cuims-feature-item">
+              <div class="cuims-feat-icon-bubble feat-att">
+                <span class="material-symbols-outlined">fact_check</span>
+              </div>
+              <div class="cuims-feat-text">
+                <strong>75% Attendance Compliance Engine</strong>
+                <span>Automated Ordinance 7.2 bunk calculator & shortage alerts</span>
+              </div>
+            </div>
+
+            <div class="cuims-feature-item">
+              <div class="cuims-feat-icon-bubble feat-time">
+                <span class="material-symbols-outlined">calendar_month</span>
+              </div>
+              <div class="cuims-feat-text">
+                <strong>Official VLHC Lecture Schedule</strong>
+                <span>Vivekananda Complex rooms F1, B2, G1, G2, LH-108 synced</span>
+              </div>
+            </div>
+
+            <div class="cuims-feature-item">
+              <div class="cuims-feat-icon-bubble feat-pass">
+                <span class="material-symbols-outlined">qr_code_2</span>
+              </div>
+              <div class="cuims-feat-text">
+                <strong>Digital Hostel Gate Pass (24x7)</strong>
+                <span>QR verified leave permits for Kailash, Himadri & Parvati</span>
+              </div>
+            </div>
+
+            <div class="cuims-feature-item">
+              <div class="cuims-feat-icon-bubble feat-grade">
+                <span class="material-symbols-outlined">grade</span>
+              </div>
+              <div class="cuims-feat-text">
+                <strong>Academic Grades & SGPA Transcripts</strong>
+                <span>Semester transcript records & syllabus completion tracker</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile App Download Badges (Exact CUIMS students.cuchd.in style) -->
+          <div class="cuims-mobile-apps-section">
+            <div class="cuims-mobile-title">
+              <span class="material-symbols-outlined" style="font-size: 16px;">smartphone</span>
+              <span>Download NITH-IS Student App</span>
+            </div>
+            <div class="cuims-app-badges-row">
+              <button type="button" class="cuims-app-store-btn" onclick="alert('NITH-IS Mobile App: Official Android APK download portal')">
+                <svg class="cuims-store-svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3.609 1.814L13.792 12 3.61 22.186a1.947 1.947 0 01-.61-1.424V3.238c0-.54.22-1.049.609-1.424zm11.242 11.243l2.25 2.25-12.062 6.945 9.812-9.195zm0-2.114L5.039 1.748l12.062 6.945-2.25 2.25zm1.09 1.09l3.522 2.025a1.5 1.5 0 010 2.597l-3.522 2.025-1.782-1.782 1.782-1.865z" />
+                </svg>
+                <div>
+                  <span class="store-sub">GET IT ON</span>
+                  <span class="store-main">Google Play</span>
+                </div>
+              </button>
+
+              <button type="button" class="cuims-app-store-btn" onclick="alert('NITH-IS Mobile App: iOS TestFlight build available via CC')">
+                <svg class="cuims-store-svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.38c.62-.75 1.04-1.8 0.93-2.85-.9.04-2 .6-2.65 1.35-.58.66-1.09 1.73-.95 2.76.99.08 2.05-.51 2.67-1.26z" />
+                </svg>
+                <div>
+                  <span class="store-sub">Download on the</span>
+                  <span class="store-main">App Store</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cuims-showcase-bottom">
+          <span>Session: Jan - Jun 2026 (Even Sem)</span>
+          <span>Computer Centre • NIT Hamirpur</span>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- RIGHT PANEL: CUIMS AUTHENTICATION CONSOLE                 -->
+      <!-- ========================================================= -->
+      <div class="cuims-right-auth">
+        <div>
+          <!-- Role Switcher Pills -->
+          <div class="cuims-role-tabs-bar">
+            <button type="button" class="cuims-role-pill-btn active" id="btnRoleTabStudent" onclick="selectModalRole('student')">
+              <span class="material-symbols-outlined">school</span>
+              <span>Student / Parent</span>
+            </button>
+            <button type="button" class="cuims-role-pill-btn" id="btnRoleTabStaff" onclick="selectModalRole('staff')">
+              <span class="material-symbols-outlined">badge</span>
+              <span>Faculty / Staff</span>
+            </button>
+            <button type="button" class="cuims-role-pill-btn" id="btnRoleTabAdmission" onclick="selectModalRole('admission')">
+              <span class="material-symbols-outlined">how_to_reg</span>
+              <span>Admissions</span>
+            </button>
+          </div>
+
+          <!-- Header Banner inside login form -->
+          <div class="cuims-login-header-banner">
+            <div class="cuims-form-crest">
+              <span class="material-symbols-outlined" id="modalRoleIcon">account_balance</span>
+            </div>
+            <div>
+              <h2 class="cuims-login-title" id="modalRoleTitle">Log in</h2>
+              <p class="cuims-login-sub" id="modalRoleSub">
+                Welcome to University Information Management System — <span class="cuims-campus-highlight">Hamirpur Campus</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Mode Switcher (Sign In vs Sign Up) -->
+          <div class="cuims-auth-mode-switch" id="authModeTabs">
+            <button type="button" class="cuims-auth-mode-tab active" id="tabModeSignIn" onclick="switchAuthMode('signin')">
+              <span class="material-symbols-outlined">login</span>
+              <span>Sign In</span>
+            </button>
+            <button type="button" class="cuims-auth-mode-tab" id="tabModeSignUp" onclick="switchAuthMode('signup')">
+              <span class="material-symbols-outlined">person_add</span>
+              <span>First Time Registration (@nith.ac.in)</span>
+            </button>
+          </div>
+
+          <!-- 1. SIGN IN FORM -->
+          <form id="activeRoleLoginForm" class="cuims-login-form">
+            <div class="cuims-form-group">
+              <label id="modalUserLabel">User ID / Roll Number (UID)</label>
+              <div class="cuims-input-wrapper">
+                <span class="material-symbols-outlined cuims-field-icon">person</span>
+                <input type="text" id="modalUserInput" placeholder="Enter User Id (e.g. 26BCE123 or 26BCS042)" oninput="handleStaticRollInput(this.value)" required>
+              </div>
+              <div id="staticDetectedBranchPill" class="cuims-detected-pill hidden">
+                <span class="material-symbols-outlined">verified</span>
+                <span id="staticDetectedBranchText">Civil Engineering • Section D • LH-108</span>
+              </div>
+            </div>
+
+            <!-- Department / Branch Selector -->
+            <div class="cuims-form-group" id="deptSelectorGroup">
+              <label>Department / Official Schedule</label>
+              <div class="cuims-input-wrapper">
+                <span class="material-symbols-outlined cuims-field-icon">school</span>
+                <select id="modalDeptSelect" onchange="switchDepartment(this.value)">
+                  <option value="CE">Civil Engineering (CE) • Section D (LH-108 / F1)</option>
+                  <option value="CSE">Computer Science & Engg (CSE) • Section F (LH-104 / B2)</option>
+                  <option value="ECE">Electronics & Communication (ECE) • Section G (LH-102 / G1)</option>
+                  <option value="EE">Electrical Engineering (EE) • Section H (LH-103 / G2)</option>
+                  <option value="ME">Mechanical Engineering (ME) • Section B (LH-105 / G1)</option>
+                  <option value="CHE">Chemical Engineering (CHE) • Section I (LH-106 / F1)</option>
+                  <option value="MSE">Materials Science & Engg (MSE) • Section E (LH-107 / F2)</option>
+                  <option value="MC">Mathematics & Computing (M&C) • Section E (LH-109 / F2)</option>
+                  <option value="ARCH">Architecture (B.Arch) • Section Z (DoA Studio I)</option>
+                  <option value="DCS">Dual Degree CSE (DCS)</option>
+                  <option value="DCE">Dual Degree ECE (DCE)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="cuims-form-group">
+              <label>Password / Pin</label>
+              <div class="cuims-input-wrapper">
+                <span class="material-symbols-outlined cuims-field-icon">lock</span>
+                <input type="password" id="modalPasswordInput" placeholder="Enter Password" required>
+                <button type="button" class="cuims-password-toggle-btn" onclick="togglePasswordVisibility('modalPasswordInput', this)">
+                  <span class="material-symbols-outlined">visibility</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="cuims-form-group">
+              <label>Security Verification Code (Captcha)</label>
+              <div class="cuims-captcha-container">
+                <div class="cuims-captcha-card" id="modalCaptchaBox">
+                  <div class="cuims-captcha-noise-line noise-1"></div>
+                  <div class="cuims-captcha-noise-line noise-2"></div>
+                  <span class="cuims-captcha-char char-1">8</span>
+                  <span class="cuims-captcha-char char-2">M</span>
+                  <span class="cuims-captcha-char char-3">4</span>
+                  <span class="cuims-captcha-char char-4">K</span>
+                  <span class="cuims-captcha-char char-5">2</span>
+                </div>
+                <button type="button" class="cuims-captcha-reload-btn" onclick="reloadModalCaptcha()"><span class="material-symbols-outlined">sync</span></button>
+                <div class="cuims-input-wrapper cuims-captcha-input">
+                  <input type="text" id="modalCaptchaInput" placeholder="Enter Captcha" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="cuims-form-extras">
+              <label class="cuims-remember-label">
+                <input type="checkbox" id="modalRememberMe" checked>
+                <span>Remember UID on this device</span>
+              </label>
+              <button type="button" class="cuims-forgot-link" onclick="openForgotHelpModal()">Forgot Password / PIN?</button>
+            </div>
+
+            <button type="submit" class="cuims-primary-submit-btn">
+              <span id="modalSubmitText">NEXT / SIGN IN TO STUDENT PORTAL</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+
+            <div class="cuims-secondary-or-row">
+              <div class="cuims-or-divider"><span>OR</span></div>
+              <button type="button" class="cuims-reg-button-link" onclick="switchAuthMode('signup')" id="modalRegLinkText">
+                Click here for New Student Registration
+              </button>
+            </div>
+          </form>
+
+          <!-- 2. SIGN UP FORM -->
+          <div id="signUpContainer" class="hidden">
+            <form id="signUpForm" class="cuims-login-form">
+              <div class="cuims-nith-banner">
+                <span class="material-symbols-outlined">verified_user</span>
+                <div>
+                  <strong>Official @nith.ac.in Verification</strong>
+                  <p>Enter your institutional credentials. A 6-digit verification code will be dispatched to your email.</p>
+                </div>
+              </div>
+
+              <div class="cuims-form-group">
+                <label id="signupNameLabel">Full Student Name</label>
+                <div class="cuims-input-wrapper">
+                  <span class="material-symbols-outlined cuims-field-icon">badge</span>
+                  <input type="text" id="signupFullName" placeholder="Enter Full Name (e.g. Yathartha Nagaych)" required>
+                </div>
+              </div>
+
+              <div class="cuims-form-group">
+                <label id="signupUidLabel">Student UID / Roll Number</label>
+                <div class="cuims-input-wrapper">
+                  <span class="material-symbols-outlined cuims-field-icon">id_card</span>
+                  <input type="text" id="signupRollNo" placeholder="e.g. 26bce123 or 26bcs042" required>
+                </div>
+              </div>
+
+              <div class="cuims-form-group">
+                <label>Official Institutional Email (@nith.ac.in)</label>
+                <div class="cuims-input-wrapper">
+                  <span class="material-symbols-outlined cuims-field-icon">mail</span>
+                  <input type="email" id="signupEmailInput" placeholder="yourname@nith.ac.in" required>
+                </div>
+                <div class="cuims-error-msg hidden" id="emailErrorMsg">
+                  ⚠️ Registration is restricted to official <strong>@nith.ac.in</strong> email accounts.
+                </div>
+              </div>
+
+              <div class="cuims-form-group">
+                <label>Department / Branch</label>
+                <div class="cuims-input-wrapper">
+                  <span class="material-symbols-outlined cuims-field-icon">school</span>
+                  <select id="signupBranchSelect">
+                    <option value="CE">Civil Engineering (CE) • Section D (LH-108 / F1)</option>
+                    <option value="CSE">Computer Science & Engg (CSE) • Section F (LH-104 / B2)</option>
+                    <option value="ECE">Electronics & Communication (ECE) • Section G (LH-102 / G1)</option>
+                    <option value="EE">Electrical Engineering (EE) • Section H (LH-103 / G2)</option>
+                    <option value="ME">Mechanical Engineering (ME) • Section B (LH-105 / G1)</option>
+                    <option value="CHE">Chemical Engineering (CHE) • Section I (LH-106 / F1)</option>
+                    <option value="MSE">Materials Science & Engg (MSE) • Section E (LH-107 / F2)</option>
+                    <option value="MC">Mathematics & Computing (M&C) • Section E (LH-109 / F2)</option>
+                    <option value="ARCH">Architecture (B.Arch) • Section Z (DoA Studio I)</option>
+                    <option value="DCS">Dual Degree CSE (DCS)</option>
+                    <option value="DCE">Dual Degree ECE (DCE)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="cuims-primary-submit-btn">
+                <span>SEND 6-DIGIT OTP TO EMAIL</span>
+                <span class="material-symbols-outlined">send</span>
+              </button>
+
+              <div class="cuims-secondary-or-row">
+                <button type="button" class="cuims-reg-button-link" onclick="switchAuthMode('signin')">
+                  Already registered? Back to Portal Sign In
+                </button>
+              </div>
+            </form>
+
+            <!-- OTP Step -->
+            <div id="otpVerificationStep" class="hidden">
+              <div class="cuims-otp-dispatched-box">
+                <div class="otp-box-header">
+                  <span class="material-symbols-outlined">mark_email_read</span>
+                  <span>6-Digit OTP Sent to Official Email</span>
+                </div>
+                <p>A 6-digit OTP verification code has been dispatched to your official Google Workspace address:</p>
+                <div class="otp-target-email">
+                  <span class="material-symbols-outlined">mail</span>
+                  <span id="displayOtpEmail">student@nith.ac.in</span>
+                </div>
+                <p class="otp-help-text">⏱️ Please check your institutional inbox (or spam) and enter the 6-digit OTP code below:</p>
+              </div>
+
+              <form id="otpVerifyForm" onsubmit="handleOtpSubmit(event); return false;" autocomplete="off">
+                <div class="cuims-otp-grid">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="cuims-otp-single-box" id="otp-1" autofocus>
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="cuims-otp-single-box" id="otp-2">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="cuims-otp-single-box" id="otp-3">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="cuims-otp-single-box" id="otp-4">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="cuims-otp-single-box" id="otp-5">
+                  <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" class="cuims-otp-single-box" id="otp-6">
+                </div>
+
+                <div class="cuims-otp-timer-row">
+                  <span class="otp-countdown" id="resendCountdown">Resend code in 30s</span>
+                  <button type="button" class="otp-resend-active-btn hidden" id="resendOtpBtn" onclick="resendOtp()">Resend Code Now</button>
+                  <button type="button" class="otp-change-email-btn" onclick="backToSignupStep()">Change Email</button>
+                </div>
+
+                <button type="submit" class="cuims-primary-submit-btn">
+                  <span>VERIFY CODE & CONTINUE</span>
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Step 3: Set Password Step -->
+            <div id="setPasswordStep" class="hidden">
+              <div class="cuims-otp-dispatched-box" style="background:#ecfdf5; border-color:#10b981;">
+                <div class="otp-box-header" style="color:#065f46;">
+                  <span class="material-symbols-outlined" style="color:#059669;">verified</span>
+                  <span>Email & OTP Verified Successfully!</span>
+                </div>
+                <p style="margin:6px 0 0 0; color:#047857;">Create your secure account password to access the Student Dashboard:</p>
+              </div>
+
+              <form id="setPasswordForm" onsubmit="handleSetPasswordSubmit(event); return false;" autocomplete="off">
+                <div class="cuims-form-group">
+                  <label>Create Account Password</label>
+                  <div class="cuims-input-wrapper">
+                    <span class="material-symbols-outlined cuims-field-icon">lock</span>
+                    <input type="password" id="newRegPassword" placeholder="Minimum 4 characters" required>
+                    <button type="button" class="cuims-password-toggle-btn" onclick="togglePasswordVisibility('newRegPassword', this)">
+                      <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="cuims-form-group">
+                  <label>Confirm Account Password</label>
+                  <div class="cuims-input-wrapper">
+                    <span class="material-symbols-outlined cuims-field-icon">lock_reset</span>
+                    <input type="password" id="confirmRegPassword" placeholder="Re-type password" required>
+                    <button type="button" class="cuims-password-toggle-btn" onclick="togglePasswordVisibility('confirmRegPassword', this)">
+                      <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" class="cuims-primary-submit-btn" style="background:linear-gradient(135deg, #059669 0%, #047857 100%);">
+                  <span>SET PASSWORD & ENTER STUDENT DASHBOARD</span>
+                  <span class="material-symbols-outlined">rocket_launch</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Helpdesk Footer -->
+        <div class="cuims-auth-footer-help">
+          <div class="cuims-help-contact">
+            <span>Computer Centre Helpline: <strong>+91 1972 254011</strong></span>
+            <span>•</span>
+            <span>uims-support@nith.ac.in</span>
+          </div>
+          <div class="cuims-legal-note">
+            Ordinance 7.2 attendance compliance & digital biometric passes are monitored by Academic Branch, NIT Hamirpur.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       GEMMA AI FLOATING TRIGGER & INTERACTIVE ACADEMIC ASSISTANT
+       ===================================================================== -->
+  <div class="gemma-floating-trigger" id="gemmaFloatBtn" onclick="toggleGemmaAiModal()">
+    <div class="gemma-trigger-sparkle">
+      <span class="material-symbols-outlined">auto_awesome</span>
+    </div>
+    <div class="gemma-trigger-text">
+      <span>Gemma 4 Copilot</span>
+      <small>Google Gemma 4 Ready</small>
+    </div>
+    <span class="gemma-pulse-ring"></span>
+  </div>
+
+  <!-- Gemma 4 AI Chat Modal / Drawer -->
+  <div id="gemmaModal" class="gemma-modal-overlay hidden">
+    <div class="gemma-modal-container">
+      
+      <!-- Modal Header -->
+      <div class="gemma-modal-header">
+        <div class="gemma-header-branding">
+          <div class="gemma-avatar-icon">
+            <span class="material-symbols-outlined">auto_awesome</span>
+          </div>
+          <div>
+            <h3>NITH Gemma 4 Academic Copilot</h3>
+            <div class="gemma-engine-tag">
+              <span class="pulse-gemma-dot"></span>
+              <span>Google Gemma 4 Architecture • Flagship Academic AI</span>
+            </div>
+          </div>
+        </div>
+        <div class="gemma-header-actions">
+          <button type="button" class="gemma-action-btn" onclick="openGemmaSettings()" title="Custom Google AI / Gemma 4 API Key">
+            <span class="material-symbols-outlined">key</span>
+          </button>
+          <button type="button" class="gemma-action-btn" onclick="clearGemmaChat()" title="Clear Chat History">
+            <span class="material-symbols-outlined">restart_alt</span>
+          </button>
+          <button type="button" class="gemma-close-btn" onclick="toggleGemmaAiModal()">&times;</button>
+        </div>
+      </div>
+
+      <!-- MODEL ARCHITECTURE SELECTOR TABS -->
+      <div class="gemma-model-tabs-bar" id="staticGemmaTabsBar">
+        <button type="button" class="gemma-model-tab active" id="tabGemma4" onclick="switchStaticGemmaModel('gemma-4')">
+          <span class="material-symbols-outlined tab-icon">psychology</span>
+          <span class="tab-name">Gemma 4</span>
+          <span class="tab-badge">9.4B IT</span>
+        </button>
+        <button type="button" class="gemma-model-tab" id="tabCodeGemma" onclick="switchStaticGemmaModel('codegemma')">
+          <span class="material-symbols-outlined tab-icon">terminal</span>
+          <span class="tab-name">CodeGemma 4</span>
+          <span class="tab-badge">7.2B Code</span>
+        </button>
+        <button type="button" class="gemma-model-tab" id="tabPaliGemma" onclick="switchStaticGemmaModel('paligemma')">
+          <span class="material-symbols-outlined tab-icon">document_scanner</span>
+          <span class="tab-name">PaliGemma 4</span>
+          <span class="tab-badge">3.2B Vision</span>
+        </button>
+        <button type="button" class="gemma-model-tab" id="tabShieldGemma" onclick="switchStaticGemmaModel('shieldgemma')">
+          <span class="material-symbols-outlined tab-icon">security</span>
+          <span class="tab-name">ShieldGemma 4</span>
+          <span class="tab-badge">2.8B Safety</span>
+        </button>
+      </div>
+
+      <!-- Suggested Prompt Chips -->
+      <div class="gemma-chips-bar">
+        <span class="chips-title">Quick Prompts:</span>
+        <button type="button" class="gemma-chip" onclick="askGemmaPreset('attendance')">🎓 Bunk Strategy (CS-302 OS)</button>
+        <button type="button" class="gemma-chip" onclick="askGemmaPreset('gatepass')">🏢 Draft Hostel Gate Pass</button>
+        <button type="button" class="gemma-chip" onclick="askGemmaPreset('dijkstra')">💡 Explain Dijkstra Algorithm</button>
+        <button type="button" class="gemma-chip" onclick="askGemmaPreset('rules')">📋 NIT Hamirpur 75% Rule</button>
+      </div>
+
+      <!-- Chat Messages Scroll Area -->
+      <div class="gemma-messages-scroll" id="gemmaChatHistory">
+        <!-- Initial Message -->
+        <div class="gemma-msg gemma-assistant">
+          <div class="gemma-msg-avatar">
+            <span class="material-symbols-outlined">auto_awesome</span>
+          </div>
+          <div class="gemma-msg-bubble">
+            <p><strong>Namaste! I am Gemma 4</strong>, your intelligent academic copilot powered by Google's flagship Gemma 4 architecture.</p>
+            <p>I can analyze your <strong>75% attendance bunk limits</strong>, explain tough engineering concepts (DAA, OS, DBMS), draft <strong>digital gate pass applications</strong> for Kailash/Dhauladhar hostels, or outline syllabus units.</p>
+            <div class="gemma-starter-hint">
+              <span>👉 Try tapping one of the quick prompts above or type your question below to chat with Gemma 4!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Key Settings Drawer (Optional) -->
+      <div class="gemma-settings-panel hidden" id="gemmaSettingsPanel">
+        <div class="settings-head">
+          <span>⚙️ Google AI Studio / Gemma 4 API Configuration</span>
+          <button type="button" class="btn-close-settings" onclick="closeGemmaSettings()">&times;</button>
+        </div>
+        <p>You can optionally plug in your Google Gemini / Gemma 4 API Key. By default, Gemma 4 runs using high-accuracy built-in simulation tuned for NIT Hamirpur.</p>
+        <div class="api-key-input-row">
+          <input type="password" id="gemmaApiKeyInput" placeholder="Enter Gemma 4 / Gemini API Key (Optional)">
+          <button type="button" class="btn-save-key" onclick="saveGemmaApiKey()">Save Key</button>
+        </div>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form class="gemma-input-bar" id="gemmaChatForm" onsubmit="handleGemmaSubmit(event)">
+        <input type="text" id="gemmaPromptInput" placeholder="Ask Gemma 4: e.g. Can I bunk CS-301 tomorrow? or Explain semaphore..." autocomplete="off">
+        <button type="submit" class="gemma-send-btn" id="gemmaSendBtn">
+          <span class="material-symbols-outlined">send</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       SUPABASE CLOUD DATABASE & DATA STORAGE MANAGER MODAL
+       ===================================================================== -->
+  <div id="supabaseModal" class="supabase-modal-overlay hidden">
+    <div class="supabase-modal-container">
+      
+      <!-- Modal Header -->
+      <div class="supabase-modal-header">
+        <div class="supabase-header-title-group">
+          <div class="supabase-avatar-icon">
+            <span>⚡</span>
+          </div>
+          <div>
+            <h3>Supabase Cloud PostgreSQL & Storage</h3>
+            <p>NIT Hamirpur Informatics System • Official Realtime Database Layer</p>
+          </div>
+        </div>
+        <button type="button" class="supabase-close-btn" onclick="closeSupabaseModal()">&times;</button>
+      </div>
+
+      <!-- Supabase Live Status Bar -->
+      <div class="supabase-status-banner">
+        <div class="supabase-status-left">
+          <span class="supabase-dot-pulse" id="supabaseModalDot"></span>
+          <div>
+            <strong id="supabaseStatusHeading">Supabase Realtime Cloud Sync Active</strong>
+            <small id="supabaseStatusDetail">Connected to Supabase PostgreSQL • Dual-mode local & cloud persistence</small>
+          </div>
+        </div>
+        <div class="supabase-status-badge" id="supabaseStatusBadge">
+          <span class="material-symbols-outlined">cloud_done</span>
+          <span>Live Synced</span>
+        </div>
+      </div>
+
+      <!-- Realtime Table Metrics -->
+      <div class="supabase-tables-grid">
+        <div class="supabase-stat-card">
+          <div class="stat-icon-wrap user-stat">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num" id="statUsersCount">28</span>
+            <span class="stat-label">nith_users</span>
+          </div>
+        </div>
+        <div class="supabase-stat-card">
+          <div class="stat-icon-wrap pass-stat">
+            <span class="material-symbols-outlined">qr_code_scanner</span>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num" id="statPassesCount">19</span>
+            <span class="stat-label">nith_gate_passes</span>
+          </div>
+        </div>
+        <div class="supabase-stat-card">
+          <div class="stat-icon-wrap att-stat">
+            <span class="material-symbols-outlined">fact_check</span>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num" id="statAttendanceCount">52</span>
+            <span class="stat-label">nith_attendance</span>
+          </div>
+        </div>
+        <div class="supabase-stat-card">
+          <div class="stat-icon-wrap syl-stat">
+            <span class="material-symbols-outlined">menu_book</span>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num" id="statSyllabusCount">14</span>
+            <span class="stat-label">nith_syllabus</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Tabs Navigation -->
+      <div class="supabase-tabs-nav">
+        <button class="supabase-tab-btn active" onclick="switchSupabaseTab('config')" id="tabBtn-config">
+          <span class="material-symbols-outlined">settings</span>
+          <span>Connection Settings</span>
+        </button>
+        <button class="supabase-tab-btn" onclick="switchSupabaseTab('schema')" id="tabBtn-schema">
+          <span class="material-symbols-outlined">terminal</span>
+          <span>PostgreSQL Schema (SQL)</span>
+        </button>
+        <button class="supabase-tab-btn" onclick="switchSupabaseTab('data')" id="tabBtn-data">
+          <span class="material-symbols-outlined">table_view</span>
+          <span>Live Data Explorer</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Connection Settings -->
+      <div class="supabase-tab-pane active" id="pane-config">
+        <div class="supabase-config-form">
+          <div class="form-instruction">
+            <p>Connect your custom <strong>Supabase Project</strong> or use the built-in NITH cloud storage endpoint. All OTP registrations, digital hostel QR passes, and 75% attendance logs automatically sync to Supabase tables.</p>
+          </div>
+          <div class="input-field-group">
+            <label>Supabase Project URL</label>
+            <input type="text" id="supabaseUrlInput" placeholder="https://your-project-id.supabase.co" />
+          </div>
+          <div class="input-field-group">
+            <label>Supabase Anon Public API Key</label>
+            <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+          </div>
+          <div class="config-actions-row">
+            <button type="button" class="btn-save-supabase" onclick="saveCustomSupabaseConfig()">
+              <span class="material-symbols-outlined">save</span>
+              <span>Save & Connect to Supabase</span>
+            </button>
+            <button type="button" class="btn-reset-supabase" onclick="resetDefaultSupabaseConfig()">
+              <span class="material-symbols-outlined">refresh</span>
+              <span>Reset to Default</span>
+            </button>
+            <button type="button" class="btn-test-supabase" onclick="testSupabaseConnection()">
+              <span class="material-symbols-outlined">network_check</span>
+              <span>Test Ping</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: PostgreSQL Schema (SQL) -->
+      <div class="supabase-tab-pane hidden" id="pane-schema">
+        <div class="schema-header-row">
+          <p>Copy and run this SQL script in your <strong>Supabase Dashboard > SQL Editor</strong> to create all tables and indexes:</p>
+          <button class="btn-copy-sql" onclick="copySupabaseSchemaSql()">
+            <span class="material-symbols-outlined">content_copy</span>
+            <span id="copySqlBtnText">Copy SQL Script</span>
+          </button>
+        </div>
+        <pre class="supabase-sql-code" id="supabaseSqlCodeBlock">-- ========================================================================
+-- NIT HAMIRPUR INFORMATICS SYSTEM (NITH-IS) - SUPABASE POSTGRESQL DDL
+-- ========================================================================
+
+-- 1. Users Table (Strict @nith.ac.in Verified Accounts)
+CREATE TABLE IF NOT EXISTS nith_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL CHECK (email LIKE '%@nith.ac.in'),
+    full_name TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('student', 'staff', 'admission')),
+    roll_no_or_emp_id TEXT,
+    is_verified BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Digital Hostel Gate Passes (Kailash & Dhauladhar Hostels)
+CREATE TABLE IF NOT EXISTS nith_gate_passes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    pass_number TEXT UNIQUE NOT NULL,
+    student_roll_no TEXT NOT NULL,
+    student_name TEXT NOT NULL,
+    hostel_name TEXT NOT NULL,
+    room_no TEXT,
+    destination TEXT NOT NULL,
+    out_time TIMESTAMPTZ NOT NULL,
+    in_time TIMESTAMPTZ NOT NULL,
+    status TEXT DEFAULT 'APPROVED',
+    qr_code_data TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Academic 75% Attendance & Bunk Compliance
+CREATE TABLE IF NOT EXISTS nith_attendance (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_roll_no TEXT NOT NULL,
+    subject_code TEXT NOT NULL,
+    subject_name TEXT NOT NULL,
+    attended_classes INT NOT NULL,
+    total_classes INT NOT NULL,
+    percentage NUMERIC(5,2),
+    status TEXT DEFAULT 'Safe',
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Faculty Syllabus Completion & Quiz Management
+CREATE TABLE IF NOT EXISTS nith_syllabus (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_code TEXT NOT NULL,
+    course_name TEXT NOT NULL,
+    faculty_id TEXT NOT NULL,
+    units_completed INT NOT NULL,
+    total_units INT NOT NULL,
+    syllabus_percent NUMERIC(5,2),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+      </div>
+
+      <!-- Tab 3: Live Data Explorer -->
+      <div class="supabase-tab-pane hidden" id="pane-data">
+        <div class="explorer-toolbar">
+          <select id="explorerTableSelect" onchange="renderSupabaseDataExplorer()">
+            <option value="users">nith_users (Accounts)</option>
+            <option value="passes">nith_gate_passes (Hostel Passes)</option>
+            <option value="attendance">nith_attendance (75% Attendance)</option>
+            <option value="syllabus">nith_syllabus (Faculty Syllabus)</option>
+          </select>
+          <button class="btn-refresh-data" onclick="renderSupabaseDataExplorer()">
+            <span class="material-symbols-outlined">refresh</span> Refresh Table
+          </button>
+        </div>
+        <div class="explorer-table-container" id="explorerTableContainer">
+          <!-- Dynamic Table Rendered by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       PUT & EDIT ATTENDANCE MODAL (COURSE-BY-COURSE ATTENDANCE INPUT)
+       ===================================================================== -->
+  <div id="attendanceModal" class="att-modal-overlay hidden">
+    <div class="att-modal-container">
+      <div class="att-modal-header">
+        <div class="att-header-info">
+          <div class="att-header-icon">
+            <span class="material-symbols-outlined">edit_calendar</span>
+          </div>
+          <div>
+            <h3>Put & Update Course Attendance</h3>
+            <p>Department: <strong id="modalDeptName">Civil Engineering (CE)</strong> • Roll: <span id="modalRollDisplay">26bce123 • Yathartha Nagaych</span></p>
+          </div>
+        </div>
+        <button type="button" class="att-close-btn" onclick="closeAttendanceModal()">&times;</button>
+      </div>
+
+      <div class="att-modal-body">
+        <div class="att-notice-box">
+          <span class="material-symbols-outlined">info</span>
+          <div>
+            <strong>Interactive Attendance Manager</strong>
+            <p>Update your attended and total held classes for each subject below. Your 75% compliance meter and safe bunks will recalculate live and sync directly to Supabase.</p>
+          </div>
+        </div>
+
+        <div class="att-courses-list" id="modalCoursesList">
+          <!-- Dynamic Course Rows Injected by JS -->
+        </div>
+
+        <div class="att-modal-footer">
+          <button type="button" class="btn btn-outline" onclick="openAddCourseModal()">
+            <span class="material-symbols-outlined">add_circle</span>
+            <span>+ Add New Course</span>
+          </button>
+          <div class="footer-right-actions">
+            <button type="button" class="btn btn-outline" onclick="closeAttendanceModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveAllAttendanceModal()">
+              <span class="material-symbols-outlined">save</span>
+              <span>Save & Sync to Supabase</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD NEW COURSE MODAL -->
+  <div id="addCourseModal" class="att-modal-overlay hidden">
+    <div class="att-modal-container small-modal">
+      <div class="att-modal-header">
+        <div class="att-header-info">
+          <div class="att-header-icon">
+            <span class="material-symbols-outlined">post_add</span>
+          </div>
+          <div>
+            <h3>Add New Course</h3>
+            <p>Register a new subject to track attendance</p>
+          </div>
+        </div>
+        <button type="button" class="att-close-btn" onclick="closeAddCourseModal()">&times;</button>
+      </div>
+
+      <form id="addCourseForm" onsubmit="handleAddCourseSubmit(event)" class="att-modal-body">
+        <div class="form-field">
+          <label>Course Code</label>
+          <input type="text" id="newCourseCode" placeholder="e.g. CE-306" required />
+        </div>
+        <div class="form-field">
+          <label>Course Name</label>
+          <input type="text" id="newCourseName" placeholder="e.g. Hydraulic Engineering & Hydrology" required />
+        </div>
+        <div class="form-field">
+          <label>Faculty Name</label>
+          <input type="text" id="newCourseFaculty" placeholder="e.g. Dr. P. K. Sood" value="Dr. Faculty Name" required />
+        </div>
+        <div class="att-grid-2col">
+          <div class="form-field">
+            <label>Classes Attended</label>
+            <input type="number" id="newCourseAttended" min="0" value="20" required />
+          </div>
+          <div class="form-field">
+            <label>Total Classes Held</label>
+            <input type="number" id="newCourseTotal" min="1" value="24" required />
+          </div>
+        </div>
+        <div class="att-modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeAddCourseModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <span class="material-symbols-outlined">add</span>
+            <span>Add Course</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
