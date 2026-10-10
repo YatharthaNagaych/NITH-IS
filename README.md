@@ -7,8 +7,8 @@
 
 ## 🌟 Key Features
 
-1. **🎬 Zomato-Style Cinematic Campus Drone Hero**:
-   - Edge-to-edge ambient campus drone showcase with real-time controls (Pause/Play, Sound On/Off, Fullscreen, Video Switcher).
+1. Background Video
+   - Edge-to-edge ambient campus showcase.
    - High contrast video stream with clean curved portal search bar and quick access chips.
 
 2. **🎓 3 Institutional Gateways**:
